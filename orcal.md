@@ -37,19 +37,22 @@ tnsnames.ora用在oracle client端。**该文件记录数据库的本地配置�
 
 ## DML:数据操作语言
 
-a. insert
-b. update
-c. delete
+1. insert
+
+2. update
+3. delete
 
 ## DDL:数据定义语言
-a. create:创建表；创建数据库；创建用户
-b. drop：删除表；删除数据库；删除用户
-c.  alter: 修改表；修改用户
+1. create:创建表；创建数据库；创建用户
+
+2. drop：删除表；删除数据库；删除用户
+3. alter: 修改表；修改用户
 
 ## DCL:数据控制语言
-a. grant:授权
-b.commit:事务数据提交
-c.rollback:事务，数据回滚
+
+1. grant:授权
+2. commit:事务数据提交
+3. rollback:事务，数据回滚
 
 # 数据库的设计
 
@@ -91,7 +94,7 @@ c.rollback:事务，数据回滚
 
 # OracL体系结构
 
-![](Oracle image/8.png) 
+<img src="Oracle image/8.png" /> 
 
 ## 数据库——物理文件的集合
 
@@ -177,11 +180,11 @@ Autoextend on
 
 一个表空间下面可以有多个用户，而一个用户下面可以有多张表。
 
-![](Oracle image/6.png)
+<img src="Oracle image/6.png" />
 
 补充一个关系
 
-![](Oracle image/7.png)
+<img src="Oracle image/7.png" />
 
 
 
@@ -453,9 +456,80 @@ ADD PRIMARY KEY (student_id);
 
 # seq_account.nextval——递增数字值
 
-是一个数据库序列（sequence），用于生成唯一的递增数字值，通常用作主键或唯一标识符。
+要在Oracle数据库中创建一个序列（sequence），你可以使用以下语法：
 
-# ⭐练习1
+```sql
+CREATE SEQUENCE sequence_name
+    [INCREMENT BY n]
+    [START WITH n]
+    [MAXVALUE n | NOMAXVALUE]
+    [MINVALUE n | NOMINVALUE]
+    [CYCLE | NOCYCLE]
+    [CACHE n | NOCACHE];
+```
+
+下面是对每个选项的解释：
+
+- `sequence_name`：给序列指定一个唯一的名称。
+- `INCREMENT BY n`：指定每次递增的值，默认为1。
+- `START WITH n`：指定序列的起始值，默认为1。
+- `MAXVALUE n | NOMAXVALUE`：指定序列的最大值，如果设置为NOMAXVALUE，则没有最大值限制。
+- `MINVALUE n | NOMINVALUE`：指定序列的最小值，如果设置为NOMINVALUE，则没有最小值限制。
+- `CYCLE | NOCYCLE`：指示序列是否循环，即当达到最大值或最小值时是否重新开始，默认为NOCYCLE。
+- `CACHE n | NOCACHE`：指定序列缓存的值的数量，默认为NOCACHE，表示不缓存。
+
+
+
+- 每次调用`NEXTVAL`函数时，序列的值会自动递增，并返回递增后的值
+
+```sql
+SELECT sequence_name.NEXTVAL FROM DUAL;
+-- 第一次NEXTVAL返回的是初始值
+```
+
+其中，`sequence_name`是序列的名称。
+
+- `CURRVAL`函数返回的是上一次使用`NEXTVAL`函数获取的值，而不是当前调用`CURRVAL`函数时的值。
+
+```sql
+SELECT sequence_name.CURRVAL FROM DUAL;
+```
+
+需要注意的是，使用`CURRVAL`函数之前必须先使用`NEXTVAL`函数至少一次，否则会报错。另外，`CURRVAL`函数只能在同一个会话中获取序列的当前值。
+
+# **基于伪列的查询**
+
+在 Oracle 的表的使用过程中，实际表中还有一些附加的列，称为伪列。伪列就像表中的列一样，但是在表中并不存储。伪列只能查询，不能进行增删改操作。
+
+接下来学习两个伪列：ROWID 和 ROWNUM。
+
+##  ROWID
+
+表中的每一行在数据文件中都有一个物理地址，ROWID 伪列返回的就是该行的物理地址。使用 ROWID 可以快速的定位表中的某一行。ROWID 值可以唯一的标识表中的一行。由于 ROWID 返回的是该行的物理地址，因此使用 ROWID 可以显示行是如何存储的。
+
+```mysql
+select rowID,t.* from T_AREA t
+* 不可以和 rowID 一块用
+```
+
+<img src="Oracle image/18.png" style="zoom:50%;" /> 
+
+```mysql
+select rowID,t.*from T_AREA t
+where ROWID='AAAM1uAAGAAAAD8AAC';
+```
+
+## **ROWNUM**
+
+在查询的结果集中，ROWNUM 为结果集中每一行标识一个行号，第一行返回 1，第二行返回 2，以此类推。通过 ROWNUM 伪列可以限制查询结果集中返回的行数。
+
+```mysql
+select rownum,t.* from T_OWNERTYPE t
+```
+
+<img src="Oracle image/19.png" style="zoom:50%;" /> 
+
+# ⭐练习1——**项目案例：《自来水公司收费系统》**
 
 **项目案例：《自来水公司收费系统》**
 
@@ -503,6 +577,8 @@ XXX 市自来水公司为更好地对自来水收费进行规范化管理，决�
 
 .......
 
+## 表结构设计
+
 <img src="Oracle image/9.png" style="zoom: 50%;" /> 
 
 <img src="Oracle image/10.png" style="zoom:50%;" /> 
@@ -519,8 +595,8 @@ XXX 市自来水公司为更好地对自来水收费进行规范化管理，决�
 --建立价格区间表
 create  table t_pricetable
 (
-id number primary key,	#主键列的值必须是唯一且不为空的。
-price number(10,2),   	#10 表示总共可以显示的数字个数，而 2 表示小数点后面的位数。
+id number primary key,	
+price number(10,2),   	
 ownertypeid number,
 minnum number,
 maxnum number
@@ -687,7 +763,273 @@ update t_account set money=usenum*2.45;
 commit;
 ```
 
-## 题
+## 题1 基础
+
+我们的简单查询
+
+```mysql
+select * from T_ACCOUNT
+select * from T_OWNERS
+select * from T_address
+select * from T_ownertype
+select * from T_area
+select * from T_OPERATOR
+```
+
+
+
+```mysql
+# 精确查询
+select * from T_OWNERS where watermeter='30408'
+
+# 模糊查询
+select * from t_owners where name like '%刘%'
+
+# and 运算符
+select * from t_owners where name like '%刘%' and housenumber like '%5%'
+
+# or 运算符 	
+select * from t_owners
+where name like '%刘%' or housenumber like '%5%'
+
+# and 与 or 运算符混合使用
+select * from t_owners 
+where (name like '%刘%' or housenumber like '%5%') and addressid=3
+-- and 的优先级比 or 大，所以我们需要用 ( ) 来改变优先级
+
+# 范围查询
+select * from T_ACCOUNT
+where usenum>=10000 and usenum<=20000
+
+select * from T_ACCOUNT
+where usenum between 10000 and 20000
+
+# 空值查询
+select * from T_PRICETABLE t where maxnum is null
+select * from T_PRICETABLE t where maxnum is not null
+
+#去掉重复记录
+select distinct addressid from T_OWNERS
+
+select distinct A列,B列 from 表
+--(A列,B列)--
+--(1,2)--
+--(1,3)--
+
+#升序排序
+select * from T_ACCOUNT order by usenum
+
+#降序排序	
+select * from T_ACCOUNT order by usenum desc
+
+#伪列的查询ROWID
+select rowID,t.* from T_AREA t
+select rownum,t.* from T_OWNERTYPE t
+
+# 聚合函数-求和 sum
+select sum(usenum) from t_account where year='2012'
+
+# 聚合函数-求平均 avg
+select avg(usenum) from T_ACCOUNT where year='2012'
+
+#聚合函数-求最大值 max 	
+select max(usenum) from T_ACCOUNT where year='2012'
+
+# 聚合函数-求最小值 min
+select min(usenum) from T_ACCOUNT where year='2012'
+
+# 统计记录个数 count
+select count(*) from T_OWNERS t where ownertypeid=1
+
+#分组聚合 Group by
+select areaid,sum(money) from t_account group by areaid
+
+#分组后条件查询 having
+select areaid,sum(money) from t_account group by areaid
+having sum(money)>169000
+
+#连接查询
+-- 2个表
+select o.id 业主编号,o.name 业主名称,ot.name 业主类型
+from T_OWNERS o,T_OWNERTYPE ot
+where o.ownertypeid=ot.id
+-- 3个表
+select o.id 业主编号,o.name 业主名称,ad.name 地址,ot.name 业主类型
+from T_OWNERS o,T_OWNERTYPE ot,T_ADDRESS ad
+where o.ownertypeid=ot.id and o.addressid=ad.id
+-- 4个表
+select o.id 业主编号,o.name 业主名称,ar.name 区域, ad.name 地址, ot.name 业主类型
+from T_OWNERS o ,T_OWNERTYPE ot,T_ADDRESS ad,T_AREA ar
+where 	o.ownertypeid=ot.id 
+and 	o.addressid=ad.id 
+and 	ad.areaid=ar.id
+-- 5个表
+select 
+	ow.id 业主编号,
+	ow.name 业主名称,
+	ad.name 地址,
+	ar.name 所属区域,
+	op.name 收费员,
+    ot.name 业主类型
+from 
+	T_OWNERS ow,
+	T_OWNERTYPE ot,
+	T_ADDRESS ad ,
+	T_AREA ar,
+	T_OPERATOR op
+where 
+	ow.ownertypeid=ot.id 
+and 
+	ow.addressid=ad.id
+and 
+	ad.areaid=ar.id 
+and 
+	ad.operatorid=op.id
+	
+```
+## 题2 左外连接
+
+```mysql
+# 左外连接查询
+
+-- sql1999
+SELECT ow.id,ow.name,ac.year ,ac.month,ac.money
+FROM T_OWNERS ow left join T_ACCOUNT ac
+on ow.id=ac.owneruuid
+-- oracle
+SELECT ow.id,ow.name,ac.year ,ac.month,ac.money FROM
+T_OWNERS ow,T_ACCOUNT ac
+WHERE ow.id=ac.owneruuid(+)
+```
+
+需求：查询业主的账务记录，显示业主编号、名称、年、月、金额。如果此业主没有账务记录也要列出姓名。
+
+（有的用户没有账户记录，但是也要列出来）
+
+<img src="Oracle image/20.png" style="zoom: 50%;" /> 
+
+**右外连接查询**
+
+```mysql
+-- sql1999
+select ow.id,ow.name,ac.year,ac.month,ac.money 
+from
+	T_OWNERS ow right join T_ACCOUNT ac
+on 
+	ow.id=ac.owneruuid
+
+-- oracle
+select ow.id,ow.name,ac.year,ac.month,ac.money 
+from
+	T_OWNERS ow , T_ACCOUNT ac
+where 
+	ow.id(+) =ac.owneruuid
+```
+
+
+
+## 题3 **子查询**
+
+**单行子查询**
+
+**where** **子句中的子查询**
+
+查询 2012 年 1 月用水量大于(此月)平均值的台账记录
+
+```mysql
+-- 标量子查询
+select * from T_ACCOUNT
+where year='2012' and month='01' 
+and 
+	usenum>( select avg(usenum) from T_ACCOUNT where year='2012' and month='01' )
+```
+
+**多行子查询**
+
+**in** **运算符**
+
+```mysql
+select * from T_OWNERS
+where addressid in ( 1,3,4 )
+```
+
+
+
+```mysql
+-- in
+select * from T_OWNERS
+where addressid in
+	( select id from t_address where name like '%花园%' )
+-- not in
+select * from T_OWNERS
+where addressid not in
+	( select id from t_address where name like '%花园%' )
+```
+
+**from** **子句中的子查询**
+
+from 子句的子查询为多行子查询
+
+```mysql
+select * 
+from
+	(	select o.id 业主编号,o.name 业主名称,ot.name 业主类型
+		from 
+     		T_OWNERS o,T_OWNERTYPE ot
+		where 
+     		o.ownertypeid=ot.id)
+where 
+	业主类型='居民'
+	
+
+```
+
+**select** **子句中的子查询**
+
+select 子句的子查询必须为单行子查询
+
+- 1需求：列出业主信息，包括 ID，名称，**所属地址**（id->name）。
+
+```mysql
+-- 理解
+select 
+	id,
+	name,
+	(select name from t_address ta where ta.id=o.addressid) addressname
+from 
+	t_owners o
+
+-- 实际
+select id,name,
+(select name from t_address where addressid=id) addressname
+from t_owners
+```
+
+<img src="Oracle image/21.png" style="zoom:50%;" /> 
+
+- 2	列出业主信息，包括 ID，名称，所属地址，**所属区域**（id->name）。
+
+```mysql
+select 
+	id,
+	name,
+	( select name from t_address where id=addressid )	addressname,
+	( select (select name from t_area where id=areaid )from t_address where id=addressid )
+	adrename
+from 
+	t_owners;
+
+-- 理解
+select id,name,
+(select name from t address where id=addressid) addressname
+(select areaid from t address where id=addressid) areaid
+from t owners
+-- areaid -> (select name from t_area where id=areaid ) 
+```
+
+<img src="Oracle image/22.png" style="zoom:50%;" /> 
+
+## 题4**分页查询**
 
 
 
