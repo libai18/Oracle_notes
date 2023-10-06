@@ -1,211 +1,3 @@
-#  配置环境
-
-## SQLPlus **远程连接** **ORACLE** **数据库**
-
-在`D:\instantclient_12_1`下cmd
-
-```cmd
-sqlplus system/itcast@192.168.80.10:1521/orcl
-```
-
-## tnsnames.ora——记录数据库的本地配置
-
-tnsnames.ora用在oracle client端。**该文件记录数据库的本地配置（定义网络服务）。**　
-
-> client	客户，委托人
-
-1. 用文本方式打开，中文部分是需要修改的部分
-
-```tex
-本地实例名 =
-  (DESCRIPTION =
-    (ADDRESS = (PROTOCOL = TCP)(HOST = 远程数据库IP地址)(PORT = 远程服务器端口号))
-    (CONNECT_DATA =
-      (SERVER = DEDICATED)
-      (SERVICE_NAME = 远程数据库服务名)
-    )
-  )
-```
-
-<img src="Oracle image/4.png" style="zoom: 67%;" /> 
-
-2. 然后打开pl/sql就能看到自己创建的链接，如图：
-
-<img src="Oracle image/5.png" style="zoom:50%;" /> 
-
-# SQL语句的分类
-
-## DML:数据操作语言
-
-1. insert
-
-2. update
-3. delete
-
-## DDL:数据定义语言
-1. create:创建表；创建数据库；创建用户
-
-2. drop：删除表；删除数据库；删除用户
-3. alter: 修改表；修改用户
-
-## DCL:数据控制语言
-
-1. grant:授权
-2. commit:事务数据提交
-3. rollback:事务，数据回滚
-
-# 数据库的设计
-
-## ER图（实体关系图）:
-
- （Entity-Relationship Model）
-
-<img src="Oracle image/13.png" style="zoom:50%;" /> 
-
-> Entity 	独立存在物；实体
-
-例:酒店管理系统E-R图: 
-
-<img src="Oracle image/14.png" style="zoom:67%;" /> 
-
-
-
-## **映射基数**
-
-<img src="Oracle image/16.png" style="zoom:50%;" /> 
-
-## 绘制数据库模型图
-
-以酒店管理系统为例:
-
-<img src="Oracle image/15.png" style="zoom:150%;" /> 
-
-将**有箭头的一端指向主表**, 没有箭头的一段指向子表
-
- 主表：在数据库中建立的表格即Table，其中存在主键(primary key)用于与其它表相关联，并且作为在主表中的唯一性标识。
-
-  从表：以主表的主键（primary key）值为外键 (Foreign Key)的表，可以通过外键与主表进行关联查询。从表与主表通过外键进行关联查询。
-
-在数据库设计中，主表和子表之间通常存在一种父子关系或者一对多的关系。
-
-## 如何确定主表和从表？
-
-  则完全取决于业务，业务上的主体就是主表，比如软件A是为老师而设计，用于管理学生的，那老师就是主表，软件B是为家长设计，用于管理老师的，那学生就是主表。主表和从表没有绝对，完全取决业务上的重心。
-
-# OracL体系结构
-
-<img src="Oracle image/8.png" /> 
-
-## 数据库——物理文件的集合
-
-Oracle 数据库是数据的物理存储。这就包括（数据文件 ORA 或者 DBF、控制文件、联机日志、参数文件）。
-
-<img src="Oracle image/3.png" style="zoom:67%;" /> 
-
-启动数据库：也叫全局数据库，是数据库系统的入口，它会内置一些高级权限的用户如SYS，SYSTEM等。我们用这些高级权限账号登陆就可以在数据库实例中创建表空间，用户，表了。
-
-查询当前数据库名：
-
-```sql
-select name from v$database;
-```
-
-## 实例——（Background Processes)和（Memory Structures)
-
-一个Oracle实例（Oracle Instance）有一系列的后台进程（Background Processes)和内存结构（Memory Structures)组成。一个数据库可以有 n 个实例。
-
-查询当前数据库实例名：
-
-```mysql
-select instance_name from v$instance;
-```
-
-数据库实例名(instance_name)用于对外部连接。在操作系统中要取得与数据库的联系，必须使用数据库实例名。比如我们作开发，要连接数据库，就得连接数据库实例名：
-
-
-```mysql
-jdbc:oracle:thin:@localhost:1521:orcl（orcl就为数据库实例名）
-```
-
-一个数据库可以有多个实例，在作数据库服务集群的时候可以用到。
-
-> Processes 	n.过程；进程（process 的复数）v.处理；加工
->
-> Memory	n.记忆力;存储器;内存
->
-> Background	出身背景
-
-## 表空间
-
-Oracle数据库是通过表空间来存储物理表的，一个数据库实例可以有N个表空间，一个表空间下可以有N张表。
-
-表空间(tablespace)是数据库的逻辑划分，每个数据库至少有一个表空间（称作SYSTEM表空间）。为了便于管理和提高运行效率，可以使用一些附加表空间来划分用户和应用程序。例如：USER表空间供一般用户使用，RBS表空间供回滚段使用。一个表空间只能属于一个数据库。
-
-创建表空间语法：
-
-```mysql
-Create TableSpace 表空间名称  
-DataFile          表空间数据文件路径  
-Size              表空间初始大小  
-Autoextend on
-```
-
-
-
-## ⭐ tust例题
-
-1. 以下关于Oracle数据库的数据块和操作系统的磁盘数据块的关系表述正确的是（ ）
-
-​	⭐Oracle数据库的磁盘块是操作系统磁盘块的整倍数。
-
-2. 以下关于表空间存储内容表述正确的选项是()
-
-	⭐SYSTEM表空间存储sys用户的表、视图和存储过程等
-	⭐TEMP表空间存储用户SQL语句处理的表和索引。
-	⭐UNDOTBS1表空间用于存储撤销信息。
-	⭐SYSAUX表空间是辅助表空间。
-	⭐USERS表空间存储用户创建数据表
-
-3. 以下关于表空间的描述，正确的是()
-
-	⭐1个表空间只属于一个数据库，所有对象都存在表空间中
-	⭐Oracle数据库至少存在一个表空间，即system表空间。
-	⭐System表空间必须保持联机在线。
-	⭐System表空间是数据库安装时自动创建
-	⭐1个数据文件只能属于一个表空间。
-	
-	
-
-#  **关系——表空间、用户和表**
-
-一个表空间下面可以有多个用户，而一个用户下面可以有多张表。
-
-<img src="Oracle image/6.png" />
-
-补充一个关系
-
-<img src="Oracle image/7.png" />
-
-
-
-
-
-## 表空间——*.DBF* 的文件
-
-数据库数据的物理存储空间
-那些后缀名为 *.DBF* 的文件就是表空间
-
-## 用户——操作数据库
-
-用户：可以通过用户操作数据库（前提是该用户有相应权限）
-创建用户必须为其指定表空间，如果没有显性指定表空间，则默认指定为 *USERS* 表空间
-
-## 表——数据记录的集合
-
-数据记录的集合
-
-通过对这三者的关系分析，可知道创建流程：创建表空间 → 创建用户 → 创建表。
-
 # 开始创建
 
 ## create tablespace
@@ -423,111 +215,7 @@ imp wateruser/itcast file=a.dmp tables=t_account,a_area
 
 > owner		n.物主；所有权人；主人
 
-# Primary Key——每一行都可以被唯一地标识和访问
 
-在Oracle数据库中，Primary Key（主键）是一种约束，用于唯一标识表中的每一行数据。
-
-**主键列的值必须是唯一（每个表只能有一个主键）且不为空的。**
-
-**主键的作用是确保表中的每一行都可以被唯一地标识和访问。**
-
-**可以用于创建表间的关系**，例如在关系数据库中实现表之间的连接。
-
-**在Oracle中，每个表只能有一个主键**。
-
-
-
-- 在创建表时，可以通过指定列为主键来定义主键约束。
-
-```
-CREATE TABLE students (
-  student_id NUMBER PRIMARY KEY,
-  first_name VARCHAR2(50),
-  last_name VARCHAR2(50)
-);
-```
-
-- 如果在表已经创建后需要添加主键约束，可以使用ALTER TABLE语句来修改表的结构，添加主键约束。
-
-```
-ALTER TABLE students
-ADD PRIMARY KEY (student_id);
-```
-
-# seq_account.nextval——递增数字值
-
-要在Oracle数据库中创建一个序列（sequence），你可以使用以下语法：
-
-```sql
-CREATE SEQUENCE sequence_name
-    [INCREMENT BY n]
-    [START WITH n]
-    [MAXVALUE n | NOMAXVALUE]
-    [MINVALUE n | NOMINVALUE]
-    [CYCLE | NOCYCLE]
-    [CACHE n | NOCACHE];
-```
-
-下面是对每个选项的解释：
-
-- `sequence_name`：给序列指定一个唯一的名称。
-- `INCREMENT BY n`：指定每次递增的值，默认为1。
-- `START WITH n`：指定序列的起始值，默认为1。
-- `MAXVALUE n | NOMAXVALUE`：指定序列的最大值，如果设置为NOMAXVALUE，则没有最大值限制。
-- `MINVALUE n | NOMINVALUE`：指定序列的最小值，如果设置为NOMINVALUE，则没有最小值限制。
-- `CYCLE | NOCYCLE`：指示序列是否循环，即当达到最大值或最小值时是否重新开始，默认为NOCYCLE。
-- `CACHE n | NOCACHE`：指定序列缓存的值的数量，默认为NOCACHE，表示不缓存。
-
-
-
-- 每次调用`NEXTVAL`函数时，序列的值会自动递增，并返回递增后的值
-
-```sql
-SELECT sequence_name.NEXTVAL FROM DUAL;
--- 第一次NEXTVAL返回的是初始值
-```
-
-其中，`sequence_name`是序列的名称。
-
-- `CURRVAL`函数返回的是上一次使用`NEXTVAL`函数获取的值，而不是当前调用`CURRVAL`函数时的值。
-
-```sql
-SELECT sequence_name.CURRVAL FROM DUAL;
-```
-
-需要注意的是，使用`CURRVAL`函数之前必须先使用`NEXTVAL`函数至少一次，否则会报错。另外，`CURRVAL`函数只能在同一个会话中获取序列的当前值。
-
-# **基于伪列的查询**
-
-在 Oracle 的表的使用过程中，实际表中还有一些附加的列，称为伪列。伪列就像表中的列一样，但是在表中并不存储。伪列只能查询，不能进行增删改操作。
-
-接下来学习两个伪列：ROWID 和 ROWNUM。
-
-##  ROWID
-
-表中的每一行在数据文件中都有一个物理地址，ROWID 伪列返回的就是该行的物理地址。使用 ROWID 可以快速的定位表中的某一行。ROWID 值可以唯一的标识表中的一行。由于 ROWID 返回的是该行的物理地址，因此使用 ROWID 可以显示行是如何存储的。
-
-```mysql
-select rowID,t.* from T_AREA t
-* 不可以和 rowID 一块用
-```
-
-<img src="Oracle image/18.png" style="zoom:50%;" /> 
-
-```mysql
-select rowID,t.*from T_AREA t
-where ROWID='AAAM1uAAGAAAAD8AAC';
-```
-
-## **ROWNUM**
-
-在查询的结果集中，ROWNUM 为结果集中每一行标识一个行号，第一行返回 1，第二行返回 2，以此类推。通过 ROWNUM 伪列可以限制查询结果集中返回的行数。
-
-```mysql
-select rownum,t.* from T_OWNERTYPE t
-```
-
-<img src="Oracle image/19.png" style="zoom:50%;" /> 
 
 # ⭐练习1——**项目案例：《自来水公司收费系统》**
 
@@ -1029,9 +717,170 @@ from t owners
 
 <img src="Oracle image/22.png" style="zoom:50%;" /> 
 
-## 题4**分页查询**
+## 题4 **分页查询**
+
+**简单分页**
 
 
+
+```mysql
+-- 前十条
+select rownum,t.* from T_ACCOUNT t where rownum<=10
+
+--  10-20条 没有结果
+-- 这是因为 rownum 是在查询语句扫描每条记录时产生的，所以不能使用“大于”符号，只能使用“小于”或“小于等于” ，只用“等于”也不行。
+select rownum,t.* from T_ACCOUNT t
+where rownum>10 and rownum<=20
+
+-- 10-20 先排序，在选
+select * from
+(select rownum r,t.* from T_ACCOUNT t where rownum<=20)
+where r>10
+```
+
+**基于排序的分页**
+
+需求：分页查询台账表 T_ACCOUNT，每页 10 条记录，按使用字数降序排序。
+
+我们查询第 2 页数据，如果基于上边的语句添加排序，语句如下：
+
+```mysql
+-- 错误示范（先排序后降序，序号混乱）
+select * from
+	(	
+        select rownum r,t.* 
+     	from T_ACCOUNT t 
+        where rownum<=20 
+    	order by usenum desc
+    )
+where r>10
+
+-- 正确（先排序，按排序的表标注序号）
+select * from
+	(
+        select rownum r,t.* from
+			(select * from T_ACCOUNT order by usenum desc) t
+		where rownum<=20 
+    )
+where r>10
+```
+
+## 题5 **单行函数**
+
+### **数值函数**
+
+```
+求字符串长度 
+length('ABCD')
+
+求字符串的子串
+substr('ABCD',2,2)
+
+字符串拼接 
+concat('ABC','D')
+'ABC'||'D'
+```
+
+> Concatenation 	一系列相关联的事物（或事件）;连结
+>
+> substring	子串；子链
+
+### **数值函数**
+
+```
+四舍五入
+round(100.567)
+round(100.567,2)
+
+截取函数
+trunc(100.567)
+trunc(100.567,2)
+
+取模
+mod(10,3)
+```
+
+> Truncation	截断；切掉顶端	truncate 截断，删节
+>
+> round	整数的； 圆形的  v四舍五入
+
+### **日期函数**
+
+- 获取当前日期和时间
+
+sysdate
+
+<img src="Oracle image/24.png" style="zoom: 80%;" /> 
+
+- 加月函数 ADD_MONTHS ：在当前日期基础上加指定的月
+
+add_months(sysdate,2)
+
+- 所在月最后一天 LAST_DAY
+
+last_day(sysdate)
+
+- 日期截取 TRUNC
+
+	TRUNC(sysdate)
+
+	<img src="Oracle image/25.png" style="zoom: 80%;" /> 
+
+	TRUNC(sysdate,'yyyy')
+
+	<img src="Oracle image/26.png" style="zoom:80%;" /> 
+
+	TRUNC(sysdate,'mm')
+
+	<img src="Oracle image/27.png" style="zoom:80%;" /> 
+
+	
+
+### **转换函数**
+
+- 数字转字符串 TO_CHAR
+
+TO_CHAR(1024)
+
+- 日期转字符串 TO_CHAR
+
+TO_CHAR(sysdate,'yyyy-mm-dd')
+
+TO_CHAR(sysdate,'yyyy-mm-dd hh:mi:ss')
+
+- 字符串转日期 TO_DATE
+
+TO_DATE('2017-01-01','yyyy-mm-dd')
+
+- 字符串转数字 TO_NUMBER
+
+ to_number('100') 
+
+‘100’||0 
+
+
+
+### **空值处理函数 NVL**
+
+NVL（检测的值，如果为 null 的值）；
+
+NVL(NULL,0)
+
+NVL(MAXNUM,9999999)
+
+
+
+### **空值处理函数 NVL2**
+
+NVL2（检测的值，如果不为 null 的值，如果为 null 的值）；
+
+```mysql
+select PRICE,MINNUM,NVL2(MAXNUM,to_char(MAXNUM) , '不限')
+from T_PRICETABLE where OWNERTYPEID=1
+-- 数据必须是同一性 MAXNUM 是123，
+```
+
+> invalid	无效的
 
 # ⭐练习2
 
@@ -1057,7 +906,7 @@ from t owners
 
 
 
-```
+```mysql
 CREATE TABLE student (
     学号 VARCHAR2(10) PRIMARY KEY,
     姓名 VARCHAR2(20) NOT NULL,
@@ -1128,3 +977,510 @@ INSERT INTO major VALUES ('211033', '人工智能', '人工智能学院', TO_DAT
 5.查询有不及格情况的学生信息。
 
 6.查看“人工智能学院”学生的全部信息。
+
+
+
+# SQL语句的分类
+
+## DML:数据操作语言
+
+1. insert
+
+2. update
+3. delete
+
+## DDL:数据定义语言
+
+1. create:创建表；创建数据库；创建用户
+
+2. drop：删除表；删除数据库；删除用户
+3. alter: 修改表；修改用户
+
+## DCL:数据控制语言
+
+1. grant:授权
+2. commit:事务数据提交
+3. rollback:事务，数据回滚
+
+# 数据库的设计
+
+## ER图（实体关系图）:
+
+ （Entity-Relationship Model）
+
+<img src="Oracle image/13.png" style="zoom:50%;" /> 
+
+> Entity 	独立存在物；实体
+
+例:酒店管理系统E-R图: 
+
+<img src="Oracle image/14.png" style="zoom:67%;" /> 
+
+
+
+## **映射基数**
+
+<img src="Oracle image/16.png" style="zoom:50%;" /> 
+
+## 绘制数据库模型图
+
+以酒店管理系统为例:
+
+<img src="Oracle image/15.png" style="zoom:150%;" /> 
+
+将**有箭头的一端指向主表**, 没有箭头的一段指向子表
+
+ 主表：在数据库中建立的表格即Table，其中存在主键(primary key)用于与其它表相关联，并且作为在主表中的唯一性标识。
+
+  从表：以主表的主键（primary key）值为外键 (Foreign Key)的表，可以通过外键与主表进行关联查询。从表与主表通过外键进行关联查询。
+
+在数据库设计中，主表和子表之间通常存在一种父子关系或者一对多的关系。
+
+## 如何确定主表和从表？
+
+  则完全取决于业务，业务上的主体就是主表，比如软件A是为老师而设计，用于管理学生的，那老师就是主表，软件B是为家长设计，用于管理老师的，那学生就是主表。主表和从表没有绝对，完全取决业务上的重心。
+
+# OracL体系结构
+
+<img src="Oracle image/8.png" /> 
+
+## 数据库——物理文件的集合
+
+Oracle 数据库是数据的物理存储。这就包括（数据文件 ORA 或者 DBF、控制文件、联机日志、参数文件）。
+
+<img src="Oracle image/3.png" style="zoom:67%;" /> 
+
+启动数据库：也叫全局数据库，是数据库系统的入口，它会内置一些高级权限的用户如SYS，SYSTEM等。我们用这些高级权限账号登陆就可以在数据库实例中创建表空间，用户，表了。
+
+查询当前数据库名：
+
+```sql
+select name from v$database;
+```
+
+## 实例——（Background Processes)和（Memory Structures)
+
+一个Oracle实例（Oracle Instance）有一系列的后台进程（Background Processes)和内存结构（Memory Structures)组成。一个数据库可以有 n 个实例。
+
+查询当前数据库实例名：
+
+```mysql
+select instance_name from v$instance;
+```
+
+数据库实例名(instance_name)用于对外部连接。在操作系统中要取得与数据库的联系，必须使用数据库实例名。比如我们作开发，要连接数据库，就得连接数据库实例名：
+
+
+```mysql
+jdbc:oracle:thin:@localhost:1521:orcl（orcl就为数据库实例名）
+```
+
+一个数据库可以有多个实例，在作数据库服务集群的时候可以用到。
+
+> Processes 	n.过程；进程（process 的复数）v.处理；加工
+>
+> Memory	n.记忆力;存储器;内存
+>
+> Background	出身背景
+
+## 表空间
+
+表空间是数据库的逻辑划分，一个表空间只能属于一个数据库。所有的数据库对象都存放在指定的表空间中。但主要存放的是表，所以称作表空间。
+
+Oracle中很多优化都是基于表空间的设计理念而实现的，一个数据库可以包含多个表空间，一个表空间只能属于一个数据库。**一个表空间包含多个数据文件，一个数据文件只能属于一个表空间。**
+
+Oracle 数据库中至少存放一个表空间，即SYSTEM的表空间。
+
+## 默认表空间
+
+系统中默认创建的几个表空间
+
+<img src="Oracle image/28.png" style="zoom:80%;" /> 
+
+1. **SYSTEM**
+	- 所有的dictionary object都存在SYSTEM表空间里面，存在SYS用户的表，视图，存储过程对象。
+2. **SYSAUX**
+	- 作为SYSTEM表空间的辅助表空间，减轻SYSTEM表空间负荷。
+3. **USERS**
+	- 存储用户创建的数据库对象
+4. **UNDOTBS**
+	- 存储撤销信息的undo表空间。
+5. **EXAMPLE**
+	- 数据库示例的表空间
+6. **TEMP**
+	- 临时表空间主要用途是在数据库进行排序运算，管理索引，访问视图等操纵时提供的临时的运算空间，当运算完成之后系统会自动清理。
+
+创建表空间语法：
+
+```mysql
+Create TableSpace 表空间名称  
+DataFile          表空间数据文件路径  
+Size              表空间初始大小  
+Autoextend on
+```
+
+#  **关系——表空间、用户和表**
+
+一个表空间下面可以有多个用户，而一个用户下面可以有多张表。
+
+<img src="Oracle image/6.png" />
+
+补充一个关系
+
+<img src="Oracle image/7.png" />
+
+
+
+
+
+## 表空间——*.DBF* 的文件
+
+数据库数据的物理存储空间
+那些后缀名为 *.DBF* 的文件就是表空间
+
+## 用户——操作数据库
+
+用户：可以通过用户操作数据库（前提是该用户有相应权限）
+创建用户必须为其指定表空间，如果没有显性指定表空间，则默认指定为 *USERS* 表空间
+
+## 表——数据记录的集合
+
+数据记录的集合
+
+通过对这三者的关系分析，可知道创建流程：创建表空间 → 创建用户 → 创建表。
+
+#  配置环境
+
+## SQLPlus **远程连接** **ORACLE** **数据库**
+
+在`D:\instantclient_12_1`下cmd
+
+```cmd
+sqlplus system/itcast@192.168.80.10:1521/orcl
+```
+
+## tnsnames.ora——记录数据库的本地配置
+
+tnsnames.ora用在oracle client端。**该文件记录数据库的本地配置（定义网络服务）。**　
+
+> client	客户，委托人
+
+1. 用文本方式打开，中文部分是需要修改的部分
+
+```tex
+本地实例名 =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = 远程数据库IP地址)(PORT = 远程服务器端口号))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = 远程数据库服务名)
+    )
+  )
+```
+
+<img src="Oracle image/4.png" style="zoom: 67%;" /> 
+
+2. 然后打开pl/sql就能看到自己创建的链接，如图：
+
+<img src="Oracle image/5.png" style="zoom:50%;" /> 
+
+# oracle权限
+
+oracle权限分为:
+
+系统权限: 允许用户执行特定的数据库动作，如创建表、创建索引、连接实例等。
+
+对象权限: 允许用户操纵一些特定的对象，如读取视图，可更新某些列、执行存储过程等。
+
+
+
+系统权限
+
+数据库管理员具有高级权限以完成管理任务，例如:
+
+– 创建新用户
+
+– 删除用户
+
+– 删除表
+
+– 备份表
+
+
+
+常用的系统权限:
+
+create session 创建会话 	create sequence 创建序列	create synonym 创建同名对象
+
+create table 在用户模式中创建表	create any table 在任何模式中创建表	drop table 在用户模式中删除表
+
+drop any table 在任何模式中删除表	create procedure 创建存储过程	execute any procedure 执行任何模式的存储过程
+
+create user 创建用户	drop user 删除用户	create view 创建视图
+
+
+
+1、with admin option
+with admin option的意思是被授予该权限的用户有权将某个权限(如create any table)授予其他用户或角色，取消是不级联的。
+如授予A系统权限create session with admin option,然后A又把create session权限授予B,但管理员收回A的create session权限时，B依然拥有create session的权限。但管理员可以显式收回B create session的权限，即直接revoke create session from B.
+
+> administration	管理；管理部门，
+
+2、with grant option
+with grant option的意思是：权限赋予/取消是级联的，如将with grant option用于对象授权时，被授予的用户也可把此对象权限授予其他用户或角色，不同的是但管理员收回用with grant option授权的用户对象权限时，权限会因传播而失效，如grant select on table with grant option to A,A用户把此权限授予B，但管理员收回A的权限时，B的权限也会失效，但管理员不可以直接收回B的SELECT ON TABLE 权限。
+
+
+
+Create ANY Table
+
+最近一个项目开发人员问我grant create any table to user 和  grant  create table to user 有什么区别，假如我们数据库里面有A和B两个用户，我们给A用户赋create any table权限，那么A用户就可以建立A.table和B.table等，如果我们给A用户赋create table ,那么A用户就只能建A.table表了。
+
+ # QUOTA
+
+这样就为用户设置了对表空间的使用限制。
+
+在Oracle数据库中，可以使用ALTER USER语句来设置用户对表空间的使用限制。下面是一个示例：
+
+```mysql
+-- 创建一个新的表空间
+CREATE TABLESPACE my_tablespace
+DATAFILE '/path/to/datafile.dbf'
+SIZE 100M;
+
+-- 创建一个新的用户
+CREATE USER my_user IDENTIFIED BY my_password
+DEFAULT TABLESPACE my_tablespace;
+
+-- 设置用户对表空间的使用限制
+ALTER USER my_user QUOTA UNLIMITED ON my_tablespace;
+
+-- 或者设置用户对表空间的使用限制为一个具体的大小
+ALTER USER my_user QUOTA 50M ON my_tablespace;
+```
+
+最后，使用ALTER USER语句设置了`my_user`对`my_tablespace`表空间的使用限制。
+
+在第一个ALTER USER语句中，使用了`QUOTA UNLIMITED`来表示对表空间没有任何限制。
+
+而在第二个ALTER USER语句中，使用了`QUOTA 50M`来表示对表空间的使用限制为50MB。
+
+# PASSWORD EXPIRE
+
+在Oracle数据库中,可以通过设置用户的密码过期策略来要求用户在首次登录时强制更改密码。
+
+```mysql
+-- 创建一个新用户
+CREATE USER my_user IDENTIFIED BY my_password;
+
+-- 设置密码过期策略
+ALTER USER my_user PASSWORD EXPIRE;
+
+-- 用户进行首次登录并更改密码
+CONNECT my_user/my_password
+ALTER USER my_user IDENTIFIED BY new_password;
+```
+
+> EXPIRE	到期，失效
+
+在上面的例子中,首先创建了一个名为`my_user`的新用户,并设置了初始密码为`my_password`。
+
+然后,使用ALTER USER语句将`my_user`的密码过期策略设置为`PASSWORD EXPIRE`。
+
+这样一旦用户登录,系统会提示用户密码已过期,并要求用户进行密码更改。用户可以使用CONNECT语句登录到数据库,然后使用ALTER USER语句将密码修改为新密码`new_password`。这样用户就完成了首次登录时必须更改密码的操作。通过设置密码过期策略,可以增强数据库的安全性,确保用户定期更改密码,避免使用过期或弱密码。
+
+# Primary Key——每一行都可以被唯一地标识和访问
+
+在Oracle数据库中，Primary Key（主键）是一种约束，用于唯一标识表中的每一行数据。
+
+**主键列的值必须是唯一（每个表只能有一个主键）且不为空的。**
+
+**主键的作用是确保表中的每一行都可以被唯一地标识和访问。**
+
+**可以用于创建表间的关系**，例如在关系数据库中实现表之间的连接。
+
+**在Oracle中，每个表只能有一个主键**。
+
+
+
+- 在创建表时，可以通过指定列为主键来定义主键约束。
+
+```
+CREATE TABLE students (
+  student_id NUMBER PRIMARY KEY,
+  first_name VARCHAR2(50),
+  last_name VARCHAR2(50)
+);
+```
+
+- 如果在表已经创建后需要添加主键约束，可以使用ALTER TABLE语句来修改表的结构，添加主键约束。
+
+```
+ALTER TABLE students
+ADD PRIMARY KEY (student_id);
+```
+
+# seq_account.nextval——递增数字值
+
+要在Oracle数据库中创建一个序列（sequence），你可以使用以下语法：
+
+```sql
+CREATE SEQUENCE sequence_name
+    [INCREMENT BY n]
+    [START WITH n]
+    [MAXVALUE n | NOMAXVALUE]
+    [MINVALUE n | NOMINVALUE]
+    [CYCLE | NOCYCLE]
+    [CACHE n | NOCACHE];
+```
+
+下面是对每个选项的解释：
+
+- `sequence_name`：给序列指定一个唯一的名称。
+- `INCREMENT BY n`：指定每次递增的值，默认为1。
+- `START WITH n`：指定序列的起始值，默认为1。
+- `MAXVALUE n | NOMAXVALUE`：指定序列的最大值，如果设置为NOMAXVALUE，则没有最大值限制。
+- `MINVALUE n | NOMINVALUE`：指定序列的最小值，如果设置为NOMINVALUE，则没有最小值限制。
+- `CYCLE | NOCYCLE`：指示序列是否循环，即当达到最大值或最小值时是否重新开始，默认为NOCYCLE。
+- `CACHE n | NOCACHE`：指定序列缓存的值的数量，默认为NOCACHE，表示不缓存。
+
+
+
+- 每次调用`NEXTVAL`函数时，序列的值会自动递增，并返回递增后的值
+
+```sql
+SELECT sequence_name.NEXTVAL FROM DUAL;
+-- 第一次NEXTVAL返回的是初始值
+```
+
+其中，`sequence_name`是序列的名称。
+
+- `CURRVAL`函数返回的是上一次使用`NEXTVAL`函数获取的值，而不是当前调用`CURRVAL`函数时的值。
+
+```sql
+SELECT sequence_name.CURRVAL FROM DUAL;
+```
+
+需要注意的是，使用`CURRVAL`函数之前必须先使用`NEXTVAL`函数至少一次，否则会报错。另外，`CURRVAL`函数只能在同一个会话中获取序列的当前值。
+
+# **基于伪列的查询**
+
+在 Oracle 的表的使用过程中，实际表中还有一些附加的列，称为伪列。伪列就像表中的列一样，但是在表中并不存储。伪列只能查询，不能进行增删改操作。
+
+接下来学习两个伪列：ROWID 和 ROWNUM。
+
+##  ROWID
+
+表中的每一行在数据文件中都有一个物理地址，ROWID 伪列返回的就是该行的物理地址。使用 ROWID 可以快速的定位表中的某一行。ROWID 值可以唯一的标识表中的一行。由于 ROWID 返回的是该行的物理地址，因此使用 ROWID 可以显示行是如何存储的。
+
+```mysql
+select rowID,t.* from T_AREA t
+* 不可以和 rowID 一块用
+```
+
+<img src="Oracle image/18.png" style="zoom:50%;" /> 
+
+```mysql
+select rowID,t.*from T_AREA t
+where ROWID='AAAM1uAAGAAAAD8AAC';
+```
+
+## **ROWNUM**
+
+在查询的结果集中，ROWNUM 为结果集中每一行标识一个行号，第一行返回 1，第二行返回 2，以此类推。通过 ROWNUM 伪列可以限制查询结果集中返回的行数。
+
+```mysql
+select rownum,t.* from T_OWNERTYPE t
+```
+
+<img src="Oracle image/19.png" style="zoom:50%;" /> 
+
+#  📒 tust例题
+
+🐔以下关于表空间的描述，正确的是()
+
+⭐1个表空间只属于一个数据库，所有对象都存在表空间中
+⭐1个数据文件只能属于一个表空间。
+⭐Oracle数据库至少存在一个表空间，即system表空间。
+⭐System表空间是数据库安装时自动创建
+⭐System表空间必须保持联机在线。
+
+
+
+🐔以下关于表空间存储内容表述正确的选项是()
+
+⭐SYSTEM表空间	存储sys用户的表、视图和存储过程等
+⭐TEMP表空间	    存储用户SQL语句处理的表和索引。
+⭐UNDOTBS1表空间  用于存储撤销信息。
+⭐SYSAUX表空间	 是辅助表空间。
+⭐USERS表空间	   存储用户创建数据表
+
+
+
+🐔关于schema模式和用户表述正确的是()
+
+⭐Schema是数据库对象的集合
+⭐创建一个用户的同时会为该用户创建一个同名的schema;
+⭐User定义需要权限
+⭐访问的emp表，可以使用select* from scott.emp;
+
+
+
+🐔在创建用户账号时，以下说法正确的是 ()
+
+⭐如果不设置default tablespace，则使用数据库默认表空间中
+⭐如果数据没有默认表空间，则存储在system表空间
+⭐如果用户没有定义profile文件，则使用default默认
+⭐QUOTA设置用户能够使用表空间。如果为unlimited则表示对表空间无限制。
+⭐带有Password expire时用户必需第一次登陆更改密码
+
+
+
+🐔创建完用户后，用户是否能否立刻使用oracle数据库?
+
+⭐不能
+
+
+
+🐔如果系统管理员授予用户tuster在任何用户模式下创建表的权限，那么，此用户能够直接创建表能成功吗?
+
+Grant Create ANY Table to tuster with admin option
+Create table test(lD varchar2(4),name varchar2(8))
+
+⭐不能
+
+
+
+🐔以下属于系统权限的是()
+
+⭐Create Session
+⭐alter user
+⭐Create table
+⭐Create tablespace
+select
+delete
+
+
+
+🐔Oracle下具备那些权限(角色)才能创建数据表对象
+
+⭐CONNECT和 RESOURCE
+⭐CREATE SESSION
+⭐CREATE TABLE
+⭐DBA
+
+
+
+🐔以下关于oracle数据库中NULL的说法，正确的是()
+
+⭐NULL与0、空字符串、空格都不同
+⭐对空值做加、减、乘、除等运算操作，结果仍为空
+⭐NULL的处理使用NVL函数
+⭐比较时使用关键字用“is null”和“is not null”
+⭐NULL等价于没有任何值、是未知数
+
+
+
+> Auxiliary 	 adj.辅助的；备用的 	n.助手
+> undo		撤消还原
+> Schema	   模式;架构
+> QUOTA	    定额，限额；
