@@ -22,6 +22,7 @@ identified by itcast
 default tablespace waterboss;
 ```
 
+
 ## grant dba to
 
 为用户"wateruser"授予DBA权限。
@@ -47,9 +48,10 @@ OWNERTYPEID NUMBER
 )
 ```
 
+
 ## **修改表 ALTER——ADD,MODIFY,RENAME COLUMN…TO,DROP COLUMN**
 
-增加字段语法：
+:white_square_button:增加字段语法：
 
 ```mysql
 ----追加字段
@@ -59,7 +61,8 @@ OUTDATE DATE
 )
 ```
 
- 修改字段语法：
+
+:white_square_button: 修改字段语法：
 
 ```mysql
 ALTER TABLE T_OWNERS MODIFY(
@@ -68,35 +71,42 @@ OUTDATE TIMESTAMP
 )
 ```
 
-修改字段名语法：
+
+:white_square_button:修改字段名语法：
 
 ```mysql
 ALTER TABLE T_OWNERS RENAME COLUMN OUTDATE TO EXITDATE
 ```
 
-删除字段名：
+
+:white_square_button:删除字段名：
 
 ```mysql
 --删除一个字段
 ALTER TABLE 表名称 DROP COLUMN 列名
 --删除多个字段
 ALTER TABLE 表名称 DROP (列名 1,列名 2...)
-```
-```mysql
+
+-- 举例：
 ALTER TABLE T_OWNERS DROP COLUMN REMARK
 ```
-
 > ALTER	 （使）改变，更改;
->
-> MODIFY	修改，改进；
->
+>MODIFY	修改，改进；
 > DROP	    落下;剔除，除名;下降
+
+
 
 ## **删除表——DROP TABLE**
 
 ```mysql
 DROP TABLE 表名称
 ```
+
+
+
+
+
+
 
 # **数据增删改**
 
@@ -106,11 +116,14 @@ DROP TABLE 表名称
 insert into T_OWNERTYPE (ID,NAME) VALUES (1,'居民');
 insert into T_OWNERS VALUES (1,'张三丰',1,'1-1','123456',sysdate,1 );
 commit;
+#  sysdate 用于获取当前日期
+-- 笔记：
+insert int table_name (column1,column2,column3)
+values (v1,v2,v3),(v4,v5,v6).......
 ```
 
 执行 INSERT 后一定要再执行 commit 提交事务
 
-语句中的 sysdate 是系统变量用于获取当前日期
 
 ##  **修改数据**update Table set…
 
@@ -118,9 +131,16 @@ commit;
 -- 将 ID 为 1 的业主的登记日期更改为三天前的日期
 update T_OWNERS set adddate=adddate-3 where id=1;
 commit;
+
+-- 笔记
+update table_name 
+set column1=v1,clolumn2=v2,column3=v3.......
+from table_name
+where xxx
 ```
 
 > SET	设置  ; 使处于 ; 放 ; 置 ；
+> 
 
 ## **删除数据**delete from Table
 
@@ -128,7 +148,15 @@ commit;
 -- 用于删除名为 T_OWNERS 的表中 id 为 1 的记录，并将更改提交到数据库。
 delete from T_OWNERS where id=1;
 commit;
+
+-- 笔记 清空整张表的内容
+delete from tabale_name;
+-- 删除指定的条数 
+delete from table_name
+where  xxx;
 ```
+
+
 
 ## **删除数据**truncate table Table
 
@@ -145,11 +173,23 @@ truncate table T_OWNERTYPE
 2. delete 删除可能产生碎片，并且不释放空间
 3. truncate 是先摧毁表结构，再重构表结构
 
+> truncate	截断，删节；
+
+
+
+
+
+
+
 # **数据导出与导入**
+
+```mysql
+exp(imp)  username/password@SERVICENAME:1521 file="e:\temp.dmp" full = y;
+```
 
 ## 按库
 
-- **整库导出命令**
+:white_square_button:**整库导出命令**
 
 ```
 exp system/itcast full=y
@@ -165,7 +205,7 @@ exp system/itcast full=y
 exp system/itcast  full=y file=文件名
 ```
 
-- **整库导入命令**
+:white_square_button:整库导入命令**
 
 ```
 imp system/itcast full=y
@@ -179,23 +219,29 @@ imp system/itcast full=y
 imp system/itcast full=y file=water.dmp
 ```
 
+> 输出文件 	EXPDAT
+
+
+
 ## 按用户—owner,fromuser
 
-- **按用户导出与导入**
+:arrow_forward:**按用户导出与导入**
 
 ```
 exp system/itcast owner=wateruser file=wateruser.dmp
 ```
 
-- **按用户导入**
+:arrow_forward:**按用户导入**
 
 ```
 imp system/itcast file=wateruser.dmp fromuser=wateruser
 ```
 
+
+
 ## **按表tables**
 
-- **按表导出**
+:black_square_button:按表导出**
 
 ```
 exp wateruser/itcast file=a.dmp tables=t_account,a_area
@@ -203,13 +249,11 @@ exp wateruser/itcast file=a.dmp tables=t_account,a_area
 
 用 tables 参数指定需要导出的表，如果有多个表用逗号分割即可
 
-- **按表导入**
+:black_square_button:**按表导入**
 
 ```
 imp wateruser/itcast file=a.dmp tables=t_account,a_area
 ```
-
-
 
 按需求导入，不需要都导入。
 
