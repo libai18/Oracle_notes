@@ -1,6 +1,10 @@
+# 目录
+
+[TOC]
+
 # 开始创建
 
-## create tablespace
+## 创建表空间
 
 创建一个名为"waterboss"的表空间，使用名为"c:\waterboss.dbf"的数据文件，初始大小为100MB，并且开启自动扩展功能，每次扩展10MB。
 
@@ -12,7 +16,7 @@ autoextend on
 next 10m;
 ```
 
-## create user
+## 创建用户
 
 创建一个名为"wateruser"的用户，并设置其密码为"itcast"，默认表空间为"waterboss"。
 
@@ -22,18 +26,18 @@ identified by itcast
 default tablespace waterboss;
 ```
 
-
-## grant dba to
+## 授予权限
 
 为用户"wateruser"授予DBA权限。
 
-请注意，授予DBA权限是一个非常高级别的权限，它允许用户对数据库进行几乎所有的操作。在授予DBA权限之前，请确保对用户进行了仔细的审核，并确保用户具有足够的信任和责任感。
+> 请注意，授予DBA权限是一个非常高级别的权限，它允许用户对数据库进行几乎所有的操作。在授予DBA权限之前，请确保对用户进行了仔细的审核，并确保用户具有足够的信任和责任感。
+>
 
 ```mysql
 grant dba to wateruser
 ```
 
-## **创建表**CREATE TABLE
+## 创建表
 
 这段代码是创建了一个名为"T_OWNERS"的表，表中包含了以下列：
 ```mysql
@@ -48,8 +52,7 @@ OWNERTYPEID NUMBER
 )
 ```
 
-
-## **修改表 ALTER——ADD,MODIFY,RENAME COLUMN…TO,DROP COLUMN**
+## 修改表
 
 :white_square_button:增加字段语法：
 
@@ -96,7 +99,7 @@ ALTER TABLE T_OWNERS DROP COLUMN REMARK
 
 
 
-## **删除表——DROP TABLE**
+## 删除表
 
 ```mysql
 DROP TABLE 表名称
@@ -108,15 +111,16 @@ DROP TABLE 表名称
 
 
 
-# **数据增删改**
+# 数据增删改
 
-## 插入数据 —— insert into Table VALUES( … , … );
+## 插入数据
 
 ```mysql
 insert into T_OWNERTYPE (ID,NAME) VALUES (1,'居民');
 insert into T_OWNERS VALUES (1,'张三丰',1,'1-1','123456',sysdate,1 );
 commit;
-#  sysdate 用于获取当前日期
+-- sysdate 用于获取当前日期
+
 -- 笔记：
 insert int table_name (column1,column2,column3)
 values (v1,v2,v3),(v4,v5,v6).......
@@ -125,7 +129,7 @@ values (v1,v2,v3),(v4,v5,v6).......
 执行 INSERT 后一定要再执行 commit 提交事务
 
 
-##  **修改数据**update Table set…
+##  修改数据
 
 ```mysql
 -- 将 ID 为 1 的业主的登记日期更改为三天前的日期
@@ -140,9 +144,12 @@ where xxx
 ```
 
 > SET	设置  ; 使处于 ; 放 ; 置 ；
-> 
 
-## **删除数据**delete from Table
+
+
+## 删除数据
+
+📶**delete 删除**
 
 ```mysql
 -- 用于删除名为 T_OWNERS 的表中 id 为 1 的记录，并将更改提交到数据库。
@@ -158,7 +165,7 @@ where  xxx;
 
 
 
-## **删除数据**truncate table Table
+📶**truncate删除**
 
 ```mysql
 -- 删除语句
@@ -181,77 +188,86 @@ truncate table T_OWNERTYPE
 
 
 
-# **数据导出与导入**
+# 数据导出与导入
 
 ```mysql
 exp(imp)  username/password@SERVICENAME:1521 file="e:\temp.dmp" full = y;
 ```
 
+Oracle备份文件是以dmp结尾，这种文件是oracle的逻辑备份文件，常用于数据库逻辑备份，数据库迁移等操作。
+
+
 ## 按库
 
 :white_square_button:**整库导出命令**
 
-```
+```mysql
 exp system/itcast full=y
 ```
 
 执行命令后会在当前目录下生成一个叫 EXPDAT.DMP，此文件为备份文件。
 
-<img src="Oracle image/17.png" style="zoom: 50%;" /> 
+<img src="Oracle image/17.png" style="zoom: 33%;" /> 
 
 如果想指定备份文件的名称，则添加 file 参数即可，命令如下
 
-```
+```mysql
 exp system/itcast  full=y file=文件名
 ```
 
-:white_square_button:整库导入命令**
 
-```
+
+:white_square_button:**整库导入命令**
+
+```mysql
 imp system/itcast full=y
 ```
 
 此命令如果不指定 file 参数，则默认用备份文件 EXPDAT.DMP 进行导入
 
+
 如果指定 file 参数，则按照 file 指定的备份文件进行恢复
 
-```
+```mysql
 imp system/itcast full=y file=water.dmp
 ```
 
-> 输出文件 	EXPDAT
+> EXPDAT	输出文件
 
 
 
-## 按用户—owner,fromuser
+## 按用户
 
 :arrow_forward:**按用户导出与导入**
 
-```
+```mysql
 exp system/itcast owner=wateruser file=wateruser.dmp
 ```
 
+
+
 :arrow_forward:**按用户导入**
 
-```
+```mysql
 imp system/itcast file=wateruser.dmp fromuser=wateruser
 ```
 
 
 
-## **按表tables**
+## 按表
 
-:black_square_button:按表导出**
+:black_square_button:**按表导出**
 
-```
+```mysql
 exp wateruser/itcast file=a.dmp tables=t_account,a_area
 ```
 
 用 tables 参数指定需要导出的表，如果有多个表用逗号分割即可
 
+
 :black_square_button:**按表导入**
 
-```
+```mysql
 imp wateruser/itcast file=a.dmp tables=t_account,a_area
 ```
 
@@ -261,55 +277,23 @@ imp wateruser/itcast file=a.dmp tables=t_account,a_area
 
 
 
-# ⭐练习1——**项目案例：《自来水公司收费系统》**
 
-**项目案例：《自来水公司收费系统》**
 
-**（一）项目介绍与需求分析**
 
-XXX 市自来水公司为更好地对自来水收费进行规范化管理，决定委托传智
 
-播客.黑马程序员开发《自来水公司收费系统》。考虑到自来水业务数量庞大，
+#  :fire:项目案例：《自来水公司收费系统》
 
-数据并发量高，决定数据库采用 ORACLE 数据库。主要功能包括：
+> :fire::fire::fire:先看题目，遇到不会的再看哪部分知识不会
+>
+> 项目只是更好的理解代码，而不是真正创建。对于细节，我是是初学者，不要过意不去这个部分不会，继续学语法。
 
-1.、基础信息管理：
 
-（1）业主类型设置
 
-（2）价格设置
+XXX 市自来水公司为更好地对自来水收费进行规范化管理，决定委托传智播客.黑马程序员开发《自来水公司收费系统》。考虑到自来水业务数量庞大，数据并发量高，决定数据库采用 ORACLE 数据库。
 
-（3）区域设置
 
-（4）收费员设置
 
-（5）地址设置
-
-2、业主信息管理：
-
-（1）业主信息维护
-
-（2）业主信息查询
-
-3、收费管理：
-
-（1）抄表登记
-
-（2）收费登记
-
-（3）收费记录查询
-
-（4）欠费用户清单
-
-4、统计分析：
-
-（1）收费日报单
-
-（2）收费月报表
-
-.......
-
-## 表结构设计
+## 🎃表结构设计
 
 <img src="Oracle image/9.png" style="zoom: 50%;" /> 
 
@@ -317,11 +301,21 @@ XXX 市自来水公司为更好地对自来水收费进行规范化管理，决�
 
 <img src="Oracle image/11.png" style="zoom:50%;" /> 
 
-## 数据库模型
+owneruuid number, 业主编号
 
-<img src="Oracle image/12.png" style="zoom:150%;" /> 
 
-## 代码（直接复制粘贴运行）
+
+
+
+## 🎃数库模型
+
+<img src="Oracle image/12.png" style="zoom: 150%;" /> 
+
+
+
+## 💡代码（直接复制粘贴运行）
+
+> 先看后面的查询，先不要看代码
 
 ```mysql
 --建立价格区间表
@@ -493,13 +487,24 @@ insert into t_account values( seq_account.nextval,101,1,3,'2012','12',95076,9932
 update t_account set usenum=num1-num0;
 update t_account set money=usenum*2.45;
 commit;
+
 ```
 
-## 题1 基础
+
+
+```
+-- 彻底清除干净
+-- `drop 表` 后，还需要`drop sequence`。彻底清除干净
+```
+
+
+
+## 🎖️ 基础查询
 
 我们的简单查询
 
 ```mysql
+-- 便于查询，直接复制
 select * from T_ACCOUNT
 select * from T_OWNERS
 select * from T_address
@@ -508,14 +513,39 @@ select * from T_area
 select * from T_OPERATOR
 ```
 
+> meter   计量器，计量表
 
+
+
+**:fire:闭上眼睛想一想**
+
+**like…and…or…order by…between  and …is null…distinct**
+
+**rowID…rownum**
+
+**sum…avg…max…min…count**
+
+**Group by…having….**
+
+**连接查询	 表A.=表B.**
+
+
+
+> 速通
 
 ```mysql
+-- 通过代码看看题目是什么
+
 # 精确查询
 select * from T_OWNERS where watermeter='30408'
 
 # 模糊查询
 select * from t_owners where name like '%刘%'
+-- 使用like模糊查询符合条件  其中%代表多个字符，_  代表一个字符
+-- 在表中查找名字中包含zhangsan的人的信息
+select *  from table_name where  name like '%zhangsan%';
+-- 在表中查找名字中第二个字符不为z的人
+select *  from  table_name where name not like  '_z%';
 
 # and 运算符
 select * from t_owners where name like '%刘%' and housenumber like '%5%'
@@ -543,10 +573,11 @@ select * from T_PRICETABLE t where maxnum is not null
 #去掉重复记录
 select distinct addressid from T_OWNERS
 
-select distinct A列,B列 from 表
---(A列,B列)--
---(1,2)--
---(1,3)--
+-- select distinct A列,B列 from 表
+-- (A列,B列 )--
+-- (1  ,2  )--
+-- (1  ,3  )--
+-- (2, ,4  )--
 
 #升序排序
 select * from T_ACCOUNT order by usenum
@@ -581,20 +612,24 @@ select areaid,sum(money) from t_account group by areaid
 having sum(money)>169000
 
 #连接查询
+-- 查看这些表的结构，这些表会卖关子，他只会放出ID，自己的表中才有NAME
 -- 2个表
 select o.id 业主编号,o.name 业主名称,ot.name 业主类型
 from T_OWNERS o,T_OWNERTYPE ot
 where o.ownertypeid=ot.id
+
 -- 3个表
 select o.id 业主编号,o.name 业主名称,ad.name 地址,ot.name 业主类型
 from T_OWNERS o,T_OWNERTYPE ot,T_ADDRESS ad
 where o.ownertypeid=ot.id and o.addressid=ad.id
+
 -- 4个表
 select o.id 业主编号,o.name 业主名称,ar.name 区域, ad.name 地址, ot.name 业主类型
 from T_OWNERS o ,T_OWNERTYPE ot,T_ADDRESS ad,T_AREA ar
 where 	o.ownertypeid=ot.id 
 and 	o.addressid=ad.id 
 and 	ad.areaid=ar.id
+
 -- 5个表
 select 
 	ow.id 业主编号,
@@ -619,26 +654,40 @@ and
 	ad.operatorid=op.id
 	
 ```
-## 题2 左外连接
+
+
+
+## 🎖️ 左(右)外连接
+
+需求：查询业主的账务记录，显示业主编号、名称、年、月、金额。如果此业主没有账务记录也要列出姓名。（有的用户没有账户记录，但是也要列出来）
+
+
 
 ```mysql
 # 左外连接查询
 
 -- sql1999
 SELECT ow.id,ow.name,ac.year ,ac.month,ac.money
-FROM T_OWNERS ow left join T_ACCOUNT ac
-on ow.id=ac.owneruuid
+FROM 
+	T_OWNERS ow left join T_ACCOUNT ac
+on 
+	ow.id=ac.owneruuid
+
 -- oracle
-SELECT ow.id,ow.name,ac.year ,ac.month,ac.money FROM
-T_OWNERS ow,T_ACCOUNT ac
-WHERE ow.id=ac.owneruuid(+)
+SELECT ow.id,ow.name,ac.year ,ac.month,ac.money 
+FROM 
+	T_OWNERS ow,T_ACCOUNT ac
+WHERE 
+	ow.id=ac.owneruuid(+)
+	
+-- 左边的数据多出来	ow.id,ow.name多出来（他们没有ac.year ,ac.month,ac.money数据）
 ```
 
-需求：查询业主的账务记录，显示业主编号、名称、年、月、金额。如果此业主没有账务记录也要列出姓名。
 
-（有的用户没有账户记录，但是也要列出来）
 
 <img src="Oracle image/20.png" style="zoom: 50%;" /> 
+
+
 
 **右外连接查询**
 
@@ -660,25 +709,29 @@ where
 
 
 
-## 题3 **子查询**
+## 🎖️ 子查询
 
-**单行子查询**
+🏆**单行子查询**
 
-**where** **子句中的子查询**
+🥊**where 子句中的子查询**
 
-查询 2012 年 1 月用水量大于(此月)平均值的台账记录
+查询 2012 年 1 月用户用水量大于此月**平均值**的台账记录
 
 ```mysql
 -- 标量子查询
+
+-- 思路：我们能想到		AVG(usenum)	year='2012'	 month='01' T_ACCOUNT
 select * from T_ACCOUNT
 where year='2012' and month='01' 
 and 
 	usenum>( select avg(usenum) from T_ACCOUNT where year='2012' and month='01' )
 ```
 
-**多行子查询**
 
-**in** **运算符**
+
+🏆**多行子查询**
+
+🥊**in 运算符**
 
 ```mysql
 select * from T_OWNERS
@@ -698,7 +751,9 @@ where addressid not in
 	( select id from t_address where name like '%花园%' )
 ```
 
-**from** **子句中的子查询**
+
+
+**🥊from** **子句中的子查询**
 
 from 子句的子查询为多行子查询
 
@@ -712,11 +767,11 @@ from
      		o.ownertypeid=ot.id)
 where 
 	业主类型='居民'
-	
-
 ```
 
-**select** **子句中的子查询**
+
+
+🏆**select** **子句中的子查询**
 
 select 子句的子查询必须为单行子查询
 
@@ -761,11 +816,13 @@ from t owners
 
 <img src="Oracle image/22.png" style="zoom:50%;" /> 
 
-## 题4 **分页查询**
-
-**简单分页**
 
 
+## 🎖️ 分页查询
+
+🥇**简单分页**
+
+**rownum<=**
 
 ```mysql
 -- 前十条
@@ -782,7 +839,9 @@ select * from
 where r>10
 ```
 
-**基于排序的分页**
+
+
+🥇**基于排序的分页**
 
 需求：分页查询台账表 T_ACCOUNT，每页 10 条记录，按使用字数降序排序。
 
@@ -809,18 +868,35 @@ select * from
 where r>10
 ```
 
-## 题5 **单行函数**
 
-### **数值函数**
 
-```
-求字符串长度 
+## 🎖️ 单行函数
+
+> 在大脑中想一想
+>
+> length…substr…concat
+>
+> round…trunc…
+>
+> sysdate…**trunc**
+>
+> to_date…to_char…TO_NUMBER
+>
+> nvl(… ,… )	…	nvl2(… , … , …)
+>
+
+
+
+## 数值函数
+
+```mysql
+-- 求字符串长度 
 length('ABCD')
 
-求字符串的子串
+-- 求字符串的子串
 substr('ABCD',2,2)
 
-字符串拼接 
+-- 字符串拼接 
 concat('ABC','D')
 'ABC'||'D'
 ```
@@ -829,18 +905,20 @@ concat('ABC','D')
 >
 > substring	子串；子链
 
-### **数值函数**
 
-```
-四舍五入
+
+## 数值函数
+
+```mysql
+-- 四舍五入
 round(100.567)
 round(100.567,2)
 
-截取函数
+-- 截取函数
 trunc(100.567)
-trunc(100.567,2)
+trunc(100.567,2)mysql
 
-取模
+-- 取模
 mod(10,3)
 ```
 
@@ -848,83 +926,573 @@ mod(10,3)
 >
 > round	整数的； 圆形的  v四舍五入
 
-### **日期函数**
 
-- 获取当前日期和时间
 
-sysdate
+## 日期函数
+
+🥈**获取当前日期和时间**
+
+**sysdate**
 
 <img src="Oracle image/24.png" style="zoom: 80%;" /> 
 
-- 加月函数 ADD_MONTHS ：在当前日期基础上加指定的月
 
+🥈**加月函数**
+
+ **ADD_MONTHS** ：在当前日期基础上加指定的月
+
+```
 add_months(sysdate,2)
+```
 
-- 所在月最后一天 LAST_DAY
 
+🥈**所在月最后一天**
+
+ **LAST_DAY**
+
+```
 last_day(sysdate)
+```
 
-- 日期截取 TRUNC
 
-	TRUNC(sysdate)
+🥈**日期截取 TRUNC**
 
-	<img src="Oracle image/25.png" style="zoom: 80%;" /> 
+> 当前2023,10,6
 
-	TRUNC(sysdate,'yyyy')
+```
+TRUNC(sysdate)
+```
 
-	<img src="Oracle image/26.png" style="zoom:80%;" /> 
+<img src="Oracle image/25.png" style="zoom: 80%;" /> 
 
-	TRUNC(sysdate,'mm')
+```
+TRUNC(sysdate,'yyyy')
+```
 
-	<img src="Oracle image/27.png" style="zoom:80%;" /> 
+<img src="Oracle image/26.png" style="zoom:80%;" /> 
 
-	
+```
+TRUNC(sysdate,'mm')
+```
 
-### **转换函数**
+<img src="Oracle image/27.png" style="zoom:80%;" /> 
 
-- 数字转字符串 TO_CHAR
 
+
+## 转换函数
+
+🥉**数字转字符串**
+
+ **TO_CHAR**  
+
+```
 TO_CHAR(1024)
+```
 
-- 日期转字符串 TO_CHAR
 
+🥉**日期转字符串 **
+
+**TO_CHAR**
+
+```
 TO_CHAR(sysdate,'yyyy-mm-dd')
-
 TO_CHAR(sysdate,'yyyy-mm-dd hh:mi:ss')
+```
 
-- 字符串转日期 TO_DATE
 
+🥉**字符串转日期 **
+
+**TO_DATE**
+
+```
 TO_DATE('2017-01-01','yyyy-mm-dd')
+```
 
-- 字符串转数字 TO_NUMBER
 
+
+🥉**字符串转数字 **
+
+**TO_NUMBER**
+
+```
  to_number('100') 
-
 ‘100’||0 
+```
 
 
 
-### **空值处理函数 NVL**
+## 🎖️空值函数
+
+🟨**NVL**
 
 NVL（检测的值，如果为 null 的值）；
 
+```
 NVL(NULL,0)
-
 NVL(MAXNUM,9999999)
+```
 
 
 
-### **空值处理函数 NVL2**
+**🟨NVL2**
 
 NVL2（检测的值，如果不为 null 的值，如果为 null 的值）；
 
 ```mysql
 select PRICE,MINNUM,NVL2(MAXNUM,to_char(MAXNUM) , '不限')
 from T_PRICETABLE where OWNERTYPEID=1
--- 数据必须是同一性 MAXNUM 是123，
+-- 数据必须是同一性 MAXNUM 是123(数字)，
 ```
 
 > invalid	无效的
+
+
+
+## 🎖️条件取值函数
+
+**:fire:decode**
+
+decode(条件,值 1,翻译值 1,值 2,翻译值 2,...值 n,翻译值 n,缺省值(相当于else))
+
+
+
+🐽功能：根据条件返回相应值
+
+🐽需求：显示下列信息（不要关联查询业主类型表，直接判断 1 2 3 的值）
+
+<img src="Oracle image/29.png" style="zoom:50%;" /> 
+
+```mysql
+select 
+	name,
+	decode	( ownertypeid,1,' 居 民 ',2,' 行 政 事 业 单 位',3,'商业') as 类型 
+from 
+	T_OWNERS
+```
+
+
+
+:fire:**case when then else end**
+
+上边的语句也可以用 case when then 语句来实现
+
+```mysql
+select 
+	name ,
+	(case	ownertypeid
+        when 1 then '居民'
+        when 2 then '行政事业单位'
+        when 3 then '商业'
+    else '其它' end) 
+from T_OWNERS
+```
+
+还有另外一种写法：
+
+```mysql
+-- 这种常用 else可加可不加
+select 
+	name,
+	(case
+    when ownertypeid= 1 then '居民'
+    when ownertypeid= 2 then '行政事业'
+    when ownertypeid= 3 then '商业'
+    end )
+from T_OWNERS
+```
+
+
+
+## 🎖️行列转换
+
+🎁需求：按月份统计 2012 年各个地区的水费，如下图
+
+<img src="Oracle image/30.png" style="zoom:50%;" /> 
+
+```mysql
+select 
+	(select name from T_AREA where id= areaid ) 区域,
+    sum( case when month='01' then money else 0 end) 一月,
+    sum( case when month='02' then money else 0 end) 二月,
+    sum( case when month='03' then money else 0 end) 三月,
+    sum( case when month='04' then money else 0 end) 四月,
+    sum( case when month='05' then money else 0 end) 五月,
+    sum( case when month='06' then money else 0 end) 六月,
+    sum( case when month='07' then money else 0 end) 七月,
+    sum( case when month='08' then money else 0 end) 八月,
+    sum( case when month='09' then money else 0 end) 九月,
+    sum( case when month='10' then money else 0 end) 十月,
+    sum( case when month='11' then money else 0 end) 十一月,
+    sum( case when month='12' then money else 0 end) 十二月
+from 
+	T_ACCOUNT 
+where 
+	year='2012' 
+group by 
+	areaid
+```
+
+
+
+🎁我们的原表是这样
+
+```mysql
+select areaid,year,month,sum(money)
+from T_ACCOUNT a where year='2012' 
+group by areaid,month,year
+order by areaid,year,month 
+```
+
+<img src="Oracle image/31.png" style="zoom:50%;" /> 
+
+
+
+🎁需求：按季度统计 2012 年各个地区的水费，如下图
+
+```mysql
+![33](Oracle image/33.png)select 
+	(select name from T_AREA where id= areaid ) 区域,
+    sum( case when month>='01' and month<='03' then money else 0 end) 第一季度,
+    sum( case when month>='04' and month<='06' then money else 0 end) 第二季度,
+    sum( case when month>='07' and month<='09' then money else 0 end) 第三季度,
+    sum( case when month>='10' and month<='12' then money else 0 end) 第四季度
+from T_ACCOUNT where year='2012' group by areaid
+```
+
+<img src="Oracle image/32.png" style="zoom:50%;" /> 
+
+
+
+## 🎖️分析函数
+
+> rank() over(order by usenum desc )
+
+以下三个分析函数可以用于排名使用。
+
+下图为三种排名方式的举例
+
+<img src="Oracle image/33.png" style="zoom:50%;" /> 
+
+
+
+:fire:**RANK** 
+
+相同的值排名相同，排名跳跃
+
+需求：对 T_ACCOUNT 表的 usenum 字段进行排序，相同的值排名相同，排名跳跃
+
+语句：
+
+```mysql
+select 
+	rank() over(order by usenum desc ),
+	usenum 
+from 
+	T_ACCOUNT
+```
+
+<img src="Oracle image/34.png" style="zoom:50%;" /> 
+
+> rank	排名；	队列，行列；地位，等级；
+
+
+
+**:fire:DENSE_RANK** 
+
+相同的值排名相同，排名连续
+
+需求：对 T_ACCOUNT 表的 usenum 字段进行排序，相同的值排名相同，排名连续
+
+语句：
+
+```mysql
+select 
+	dense_rank() over(order by usenum desc ),
+	usenum
+from 
+	T_ACCOUNT
+```
+
+结果：(如果你们班30人，21人考了100分，你分最低，也在10名，混子怎么可能在前面)
+
+> dense	密集的；稠密的；浓密的
+
+
+
+:fire:**ROW_NUMBER** 
+
+返回连续的排名，无论值是否相等
+
+需求：对 T_ACCOUNT 表的 usenum 字段进行排序，返回连续的排名，无论值是否相等
+
+```mysql
+select 
+	row_number() over(order by usenum desc ),
+	usenum
+from 
+	T_ACCOUNT
+```
+
+结果：(如果你们班30人，30人考了100分，大家的排名怎么都不一样？)
+
+
+
+## 🎖️集合运算
+
+集合运算，集合运算就是将两个或者多个结果集组合成为一个结果集。集合运算包括：
+
+😃UNION ALL(并集)，返回各个查询的所有记录，包括重复记录。
+
+😃UNION(并集)，返回各个查询的所有记录，不包括重复记录。
+
+😃INTERSECT(交集)，返回两个查询共有的记录。
+
+😃MINUS(差集)，返回第一个查询检索出的记录减去第二个查询检索出的记录之后剩余的记录
+
+<img src="Oracle image/35.png" style="zoom:50%;" /> 
+
+
+
+**并集运算**
+
+😊UNION ALL 不去掉重复记录
+
+```mysql
+select * from t_owners where id<=7
+union all
+select * from t_owners where id>=5
+```
+
+结果
+
+<img src="Oracle image/36.png" style="zoom:50%;" /> 
+
+(1-7 ，5-10 	重复5，6，7)
+
+
+
+😊UNION 去掉重复记录
+
+```mysql
+select * from t_owners where id<=7
+union
+select * from t_owners where id>=5
+```
+
+结果 (1-10)
+
+
+
+**交集运算**
+
+```mysql
+select * from t_owners where id<=7
+intersect
+select * from t_owners where id>=5
+```
+
+结果（5-7）
+
+> intersect	相交，交叉；
+
+
+
+**差集运算**
+
+```mysql
+select * from t_owners where id<=7
+minus
+select * from t_owners where id>=5
+```
+
+结果（1-4）
+
+> minus 	减，减去
+
+
+
+
+
+
+
+## 💎💎💎项目习题
+
+为《自来水收费系统》开发统计模块相关的功能
+
+
+
+💎**收费日报单（总）**
+
+统计某日的收费，按区域分组汇总，效果如下：
+
+<img src="Oracle image/37.png" style="zoom:50%;" /> 
+
+```mysql
+-- 统计某日的收费，按区域分组汇总
+select (select name from T_area where id=areaid ) 地区, 
+       USENUM  用水量,
+       MONEY   金额
+from t_Account
+
+-- 我第一次上手的代码，缺乏条件某日，缺乏按区域分组，缺乏用水量单位换算，缺乏金额汇总
+-- 亮点	按区划分  我们group by 谁呢？
+
+-- 答案
+select 
+	(select name from T_AREA where id= areaid ) 区域,
+	sum(usenum)/1000 "用水量(吨)" ,
+	sum(money) 金额
+from 
+	T_ACCOUNT
+where 
+	to_char(feedate,'yyyy-mm-dd')='2012-05-14'
+group by 
+	areaid
+```
+
+
+
+💎**收费日报单（收费员）**
+
+统计某收费员某日的收费，按区域分组汇总：
+
+```mysql
+select 
+	(select name from T_AREA where id= areaid ) 区域,
+	sum(usenum)/1000 "用水量(吨)" ,
+	sum(money) 金额
+from 
+	T_ACCOUNT
+where 
+	to_char(feedate,'yyyy-mm-dd')='2012-05-14'
+and 
+	feeuser=2
+group by 
+	areaid
+```
+
+
+
+💎**收费月报表（总）**
+
+```mysql
+select 
+	(select name from T_AREA where id= areaid ) 区域,
+	sum(usenum)/1000 "用水量(吨)" ,sum(money) 金额
+from 
+	T_ACCOUNT
+where 
+	to_char(feedate,'yyyy-mm')='2012-05'
+group by 
+	areaid
+```
+
+
+
+**💎收费年报表（分区域统计）**
+
+```mysql
+to_char(feedate,'yyyy')='2012'
+```
+
+
+
+**💎收费年报表（分月份统计）**
+
+统计某年收费情况，按月份分组汇总，效果如下
+
+![](Oracle image/38.png) 
+
+```mysql
+select 
+	to_char(feedate,'mm') 月份,
+	sum(usenum)/1000 使用吨数,
+	sum(money) 金额
+from 
+	T_ACCOUNT 
+where  
+	to_char(feedate,'yyyy')='2013'
+GROUP BY 
+	to_char(feedate,'mm')
+ORDER BY 
+	to_char(feedate,'mm')
+```
+
+
+
+💎**收费年报表（分月份统计）**
+
+统计某年收费情况，按月份分组汇总，效果如下
+
+<img src="Oracle image/39.png" style="zoom:90%;" /> 
+
+
+
+ 
+
+```mysql
+select '用水量(吨)' 统计项,
+      sum (case when to_char(feedate,'mm')='01'  then usenum else 0  end )/1000 一月,
+      sum (case when to_char(feedate,'mm')='02'  then usenum else 0  end )/1000 二月,
+      sum (case when to_char(feedate,'mm')='03'  then usenum else 0  end )/1000 三月,
+      sum (case when to_char(feedate,'mm')='04'  then usenum else 0  end )/1000 四月,
+      sum (case when to_char(feedate,'mm')='05'  then usenum else 0  end )/1000 五月,
+      sum (case when to_char(feedate,'mm')='06'  then usenum else 0  end )/1000 六月,
+      sum (case when to_char(feedate,'mm')='07'  then usenum else 0  end )/1000 七月,
+      sum (case when to_char(feedate,'mm')='08'  then usenum else 0  end )/1000 八月,
+      sum (case when to_char(feedate,'mm')='09'  then usenum else 0  end )/1000 九月,
+      sum (case when to_char(feedate,'mm')='10'  then usenum else 0  end )/1000 十月,
+      sum (case when to_char(feedate,'mm')='11'  then usenum else 0  end )/1000 十一月,
+      sum (case when to_char(feedate,'mm')='12'  then usenum else 0  end )/1000 十二月
+from T_ACCOUNT 
+where to_char(feedate,'yyyy')='2013'
+
+UNION ALL
+
+select '金额(元)' 统计项,
+      sum (case when to_char(feedate,'mm')='01'  then money else 0  end ) 一月,
+      sum (case when to_char(feedate,'mm')='02'  then money else 0  end ) 二月,
+      sum (case when to_char(feedate,'mm')='03'  then money else 0  end ) 三月,
+      sum (case when to_char(feedate,'mm')='04'  then money else 0  end ) 四月,
+      sum (case when to_char(feedate,'mm')='05'  then money else 0  end ) 五月,
+      sum (case when to_char(feedate,'mm')='06'  then money else 0  end ) 六月,
+      sum (case when to_char(feedate,'mm')='07'  then money else 0  end ) 七月,
+      sum (case when to_char(feedate,'mm')='08'  then money else 0  end ) 八月,
+      sum (case when to_char(feedate,'mm')='09'  then money else 0  end ) 九月,
+      sum (case when to_char(feedate,'mm')='10'  then money else 0  end ) 十月,
+      sum (case when to_char(feedate,'mm')='11'  then money else 0  end ) 十一月,
+      sum (case when to_char(feedate,'mm')='12'  then money else 0  end ) 十二月
+from T_ACCOUNT 
+where to_char(feedate,'yyyy')='2013'
+```
+
+
+
+💎**统计用水量，收费金额（分类型统计）**
+
+根据业主类型分别统计每种居民的用水量（整数，四舍五入）及收费金额 ，如根据业主类型分别统计每种居民的用水量（整数，四舍五入）及收费金额 ，如
+
+<img src="Oracle image/40.png" style="zoom:67%;" /> 
+
+​	
+
+```mysql
+-- 答案
+select
+	ow.name,
+ 	nvl( round(sum(usenum)/1000),0) "用水量(吨)" , 
+ 	nvl( sum(money),0) 金额
+from 
+	T_OWNERTYPE ow ,T_ACCOUNT ac
+where 
+	ow.id=ac.ownertype(+)  
+group by 
+	ow.name
+```
+
+
+
+
 
 # ⭐练习2
 
@@ -1024,31 +1592,47 @@ INSERT INTO major VALUES ('211033', '人工智能', '人工智能学院', TO_DAT
 
 
 
-# SQL语句的分类
+# 数据库语句的分类
 
-## DML:数据操作语言
+> DML的全称是Data Manipulation Language，
+>
+> DDL的全称是Data Definition Language，
+>
+> DCL的全称是Data Control Language。
+>
+> Manipulation	操纵
+
+
+
+**:fire: DML:数据操作语言**
 
 1. insert
 
 2. update
 3. delete
 
-## DDL:数据定义语言
+**:fire: DDL:数据定义语言**
 
 1. create:创建表；创建数据库；创建用户
 
 2. drop：删除表；删除数据库；删除用户
 3. alter: 修改表；修改用户
 
-## DCL:数据控制语言
+**:fire: DCL:数据控制语言**
 
 1. grant:授权
 2. commit:事务数据提交
 3. rollback:事务，数据回滚
 
+
+
 # 数据库的设计
 
-## ER图（实体关系图）:
+> 理解为主
+
+
+
+🎈 ER图（实体关系图）:
 
  （Entity-Relationship Model）
 
@@ -1062,11 +1646,13 @@ INSERT INTO major VALUES ('211033', '人工智能', '人工智能学院', TO_DAT
 
 
 
-## **映射基数**
+🎈 **映射基数**
 
 <img src="Oracle image/16.png" style="zoom:50%;" /> 
 
-## 绘制数据库模型图
+
+
+🎈 **绘制数据库模型图**
 
 以酒店管理系统为例:
 
@@ -1080,17 +1666,25 @@ INSERT INTO major VALUES ('211033', '人工智能', '人工智能学院', TO_DAT
 
 在数据库设计中，主表和子表之间通常存在一种父子关系或者一对多的关系。
 
-## 如何确定主表和从表？
+
+
+**🎈 如何确定主表和从表？**
 
   则完全取决于业务，业务上的主体就是主表，比如软件A是为老师而设计，用于管理学生的，那老师就是主表，软件B是为家长设计，用于管理老师的，那学生就是主表。主表和从表没有绝对，完全取决业务上的重心。
 
-# OracL体系结构
+# OracLe体系结构
+
+> 考选择，记忆
 
 <img src="Oracle image/8.png" /> 
 
-## 数据库——物理文件的集合
+**理解为主，理解不了敲代码，选择题考**
 
-Oracle 数据库是数据的物理存储。这就包括（数据文件 ORA 或者 DBF、控制文件、联机日志、参数文件）。
+
+
+**:fire: 数据库——物理文件的集合**
+
+Oracle 数据库是**数据的物理存储**。这就包括（数据文件 ORA 或者 DBF、控制文件、联机日志、参数文件）。
 
 <img src="Oracle image/3.png" style="zoom:67%;" /> 
 
@@ -1102,9 +1696,11 @@ Oracle 数据库是数据的物理存储。这就包括（数据文件 ORA 或�
 select name from v$database;
 ```
 
-## 实例——（Background Processes)和（Memory Structures)
 
-一个Oracle实例（Oracle Instance）有一系列的后台进程（Background Processes)和内存结构（Memory Structures)组成。一个数据库可以有 n 个实例。
+
+**:fire:  实例**
+
+一个Oracle实例（Oracle Instance）有一系列的**后台进程（Background Processes)和内存结构（Memory Structures)**组成。一个数据库可以有 n 个实例。
 
 查询当前数据库实例名：
 
@@ -1127,32 +1723,44 @@ jdbc:oracle:thin:@localhost:1521:orcl（orcl就为数据库实例名）
 >
 > Background	出身背景
 
-## 表空间
+
+
+**:fire:  表空间**
 
 表空间是数据库的逻辑划分，一个表空间只能属于一个数据库。所有的数据库对象都存放在指定的表空间中。但主要存放的是表，所以称作表空间。
 
-Oracle中很多优化都是基于表空间的设计理念而实现的，一个数据库可以包含多个表空间，一个表空间只能属于一个数据库。**一个表空间包含多个数据文件，一个数据文件只能属于一个表空间。**
+> 考选择，记忆
 
-Oracle 数据库中至少存放一个表空间，即SYSTEM的表空间。
+**一个数据库可以包含多个表空间，一个表空间只能属于一个数据库。**
 
-## 默认表空间
+**一个表空间包含多个数据文件，一个数据文件只能属于一个表空间。**
+
+**Oracle 数据库中至少存放一个表空间，即SYSTEM的表空间。**
+
+
+
+**:fire:  默认表空间**
+
+> 考选择，记忆
 
 系统中默认创建的几个表空间
 
 <img src="Oracle image/28.png" style="zoom:80%;" /> 
 
+
+
 1. **SYSTEM**
-	- 所有的dictionary object都存在SYSTEM表空间里面，存在SYS用户的表，视图，存储过程对象。
+  - 所有的dictionary object都存在SYSTEM表空间里面，存在SYS用户的表，视图，存储过程对象。
 2. **SYSAUX**
-	- 作为SYSTEM表空间的辅助表空间，减轻SYSTEM表空间负荷。
+  - 作为SYSTEM表空间的辅助表空间，减轻SYSTEM表空间负荷。
 3. **USERS**
-	- 存储用户创建的数据库对象
+  - 存储用户创建的数据库对象
 4. **UNDOTBS**
-	- 存储撤销信息的undo表空间。
+  - 存储撤销信息的undo表空间。
 5. **EXAMPLE**
-	- 数据库示例的表空间
+  - 数据库示例的表空间
 6. **TEMP**
-	- 临时表空间主要用途是在数据库进行排序运算，管理索引，访问视图等操纵时提供的临时的运算空间，当运算完成之后系统会自动清理。
+  - 临时表空间主要用途是在数据库进行排序运算，管理索引，访问视图等操纵时提供的临时的运算空间，当运算完成之后系统会自动清理。
 
 创建表空间语法：
 
@@ -1163,7 +1771,9 @@ Size              表空间初始大小
 Autoextend on
 ```
 
-#  **关系——表空间、用户和表**
+
+
+#  表空间、用户和表的关系
 
 一个表空间下面可以有多个用户，而一个用户下面可以有多张表。
 
@@ -1175,27 +1785,29 @@ Autoextend on
 
 
 
-
-
-## 表空间——*.DBF* 的文件
+**⭐ 表空间——*.DBF* 的文件**
 
 数据库数据的物理存储空间
 那些后缀名为 *.DBF* 的文件就是表空间
 
-## 用户——操作数据库
+**⭐ 用户——操作数据库**
 
 用户：可以通过用户操作数据库（前提是该用户有相应权限）
 创建用户必须为其指定表空间，如果没有显性指定表空间，则默认指定为 *USERS* 表空间
 
-## 表——数据记录的集合
+**⭐ 表——数据记录的集合**
 
 数据记录的集合
 
-通过对这三者的关系分析，可知道创建流程：创建表空间 → 创建用户 → 创建表。
+通过对这三者的关系分析，可知道创建流程：**创建表空间 → 创建用户 → 创建表。**
+
+
 
 #  配置环境
 
-## SQLPlus **远程连接** **ORACLE** **数据库**
+> 理解
+
+🐼**SQLPlus 远程连接 ORACLE 数据库**
 
 在`D:\instantclient_12_1`下cmd
 
@@ -1203,7 +1815,9 @@ Autoextend on
 sqlplus system/itcast@192.168.80.10:1521/orcl
 ```
 
-## tnsnames.ora——记录数据库的本地配置
+
+
+🐼 **tnsnames.ora——记录数据库的本地配置**
 
 tnsnames.ora用在oracle client端。**该文件记录数据库的本地配置（定义网络服务）。**　
 
@@ -1226,15 +1840,17 @@ tnsnames.ora用在oracle client端。**该文件记录数据库的本地配置�
 
 2. 然后打开pl/sql就能看到自己创建的链接，如图：
 
-<img src="Oracle image/5.png" style="zoom:50%;" /> 
+<img src="Oracle image/5.png" style="zoom: 67%;" /> 
 
-# oracle权限
+# 权限
+
+> 这个基础知识不常用，主要是理解，我们选择题里面会出现
 
 oracle权限分为:
 
-系统权限: 允许用户执行特定的数据库动作，如创建表、创建索引、连接实例等。
+✅**系统权限:** 允许用户执行特定的数据库动作，如创建表、创建索引、连接实例等。
 
-对象权限: 允许用户操纵一些特定的对象，如读取视图，可更新某些列、执行存储过程等。
+✅**对象权限:** 允许用户操纵一些特定的对象，如读取视图，可更新某些列、执行存储过程等。
 
 
 
@@ -1254,32 +1870,44 @@ oracle权限分为:
 
 常用的系统权限:
 
-create session 创建会话 	create sequence 创建序列	create synonym 创建同名对象
+create session 创建会话		   **create sequence 创建序列**		     create synonym 创建同名对象
 
-create table 在用户模式中创建表	create any table 在任何模式中创建表	drop table 在用户模式中删除表
+**create table 在用户模式中创建表**	create any table 在任何模式中创建表	     **drop table 在用户模式中删除表**
 
-drop any table 在任何模式中删除表	create procedure 创建存储过程	execute any procedure 执行任何模式的存储过程
+drop any table 在任何模式中删除表	    create procedure 创建存储过程	
 
-create user 创建用户	drop user 删除用户	create view 创建视图
+execute any procedure 执行任何模式的存储过程
+
+**create user 创建用户**					**drop user 删除用户**					 **create view 创建视图**
 
 
 
-1、with admin option
+📌with admin option
 with admin option的意思是被授予该权限的用户有权将某个权限(如create any table)授予其他用户或角色，取消是不级联的。
 如授予A系统权限create session with admin option,然后A又把create session权限授予B,但管理员收回A的create session权限时，B依然拥有create session的权限。但管理员可以显式收回B create session的权限，即直接revoke create session from B.
 
 > administration	管理；管理部门，
 
-2、with grant option
+📌with grant option
 with grant option的意思是：权限赋予/取消是级联的，如将with grant option用于对象授权时，被授予的用户也可把此对象权限授予其他用户或角色，不同的是但管理员收回用with grant option授权的用户对象权限时，权限会因传播而失效，如grant select on table with grant option to A,A用户把此权限授予B，但管理员收回A的权限时，B的权限也会失效，但管理员不可以直接收回B的SELECT ON TABLE 权限。
 
 
 
 Create ANY Table
 
-最近一个项目开发人员问我grant create any table to user 和  grant  create table to user 有什么区别，假如我们数据库里面有A和B两个用户，我们给A用户赋create any table权限，那么A用户就可以建立A.table和B.table等，如果我们给A用户赋create table ,那么A用户就只能建A.table表了。
+假如我们数据库里面有A和B两个用户，我们给A用户赋create any table权限，那么A用户就可以建立A.table和B.table等，如果我们给A用户赋create table ,那么A用户就只能建A.table表了。
 
- # QUOTA
+
+
+# 限制表空间的使用
+
+**quota	…	ON 	tablespace**
+
+> 这个基础知识不常用，主要是理解，我们选择题里面会出现
+>
+> quota	限额 ；定额；配额
+
+
 
 这样就为用户设置了对表空间的使用限制。
 
@@ -1308,9 +1936,15 @@ ALTER USER my_user QUOTA 50M ON my_tablespace;
 
 而在第二个ALTER USER语句中，使用了`QUOTA 50M`来表示对表空间的使用限制为50MB。
 
-# PASSWORD EXPIRE
 
-在Oracle数据库中,可以通过设置用户的密码过期策略来要求用户在首次登录时强制更改密码。
+
+# 密码过期策略
+
+> 这个基础知识不常用，主要是理解，我们选择题里面会出现
+
+**PASSWORD EXPIRE**
+
+在Oracle数据库中,可以通过设置用户的密码过期策略来**要求用户在首次登录时强制更改密码**。
 
 ```mysql
 -- 创建一个新用户
@@ -1332,7 +1966,9 @@ ALTER USER my_user IDENTIFIED BY new_password;
 
 这样一旦用户登录,系统会提示用户密码已过期,并要求用户进行密码更改。用户可以使用CONNECT语句登录到数据库,然后使用ALTER USER语句将密码修改为新密码`new_password`。这样用户就完成了首次登录时必须更改密码的操作。通过设置密码过期策略,可以增强数据库的安全性,确保用户定期更改密码,避免使用过期或弱密码。
 
-# Primary Key——每一行都可以被唯一地标识和访问
+
+
+# 主键
 
 在Oracle数据库中，Primary Key（主键）是一种约束，用于唯一标识表中的每一行数据。
 
@@ -1346,7 +1982,7 @@ ALTER USER my_user IDENTIFIED BY new_password;
 
 
 
-- 在创建表时，可以通过指定列为主键来定义主键约束。
+🟩在创建表时，可以通过指定列为主键来定义主键约束。
 
 ```
 CREATE TABLE students (
@@ -1356,14 +1992,40 @@ CREATE TABLE students (
 );
 ```
 
-- 如果在表已经创建后需要添加主键约束，可以使用ALTER TABLE语句来修改表的结构，添加主键约束。
+
+
+🟩如果在表已经创建后需要添加主键约束，可以使用ALTER TABLE语句来修改表的结构，添加主键约束。
 
 ```
 ALTER TABLE students
 ADD PRIMARY KEY (student_id);
 ```
 
-# seq_account.nextval——递增数字值
+
+
+# 序列
+
+ **sequence**	
+
+```mysql
+-- 取自自来水公司代码	
+-- 创建一个名为seq_account的序列的代码。序列是用来生成唯一数字值的对象，通常用于生成主键值。
+-- 指定每次递增的值，默认为1。指定序列的起始值，默认为1。
+create sequence seq_account;
+
+-- 
+insert into t_account values( 
+    seq_account.nextval, 
+ 1,1,1,'2012','01',30203,50123,0,1,sysdate,34.51,'1',to_date('2012-02-14','yyyy-MM-dd'),2 );
+
+insert into t_account values( 
+    seq_account.nextval,                      
+ 1,1,1,'2012','02',50123,60303,0,1,sysdate,23.43,'1',to_date('2012-03-14','yyyy-MM-dd'),2 );
+```
+
+
+
+⏹️**补充（理解）：**
 
 要在Oracle数据库中创建一个序列（sequence），你可以使用以下语法：
 
@@ -1375,21 +2037,28 @@ CREATE SEQUENCE sequence_name
     [MINVALUE n | NOMINVALUE]
     [CYCLE | NOCYCLE]
     [CACHE n | NOCACHE];
+    
 ```
 
 下面是对每个选项的解释：
 
-- `sequence_name`：给序列指定一个唯一的名称。
-- `INCREMENT BY n`：指定每次递增的值，默认为1。
-- `START WITH n`：指定序列的起始值，默认为1。
-- `MAXVALUE n | NOMAXVALUE`：指定序列的最大值，如果设置为NOMAXVALUE，则没有最大值限制。
-- `MINVALUE n | NOMINVALUE`：指定序列的最小值，如果设置为NOMINVALUE，则没有最小值限制。
-- `CYCLE | NOCYCLE`：指示序列是否循环，即当达到最大值或最小值时是否重新开始，默认为NOCYCLE。
-- `CACHE n | NOCACHE`：指定序列缓存的值的数量，默认为NOCACHE，表示不缓存。
+🌹`sequence_name`：给序列指定一个唯一的名称。
+
+🌹`INCREMENT BY n`：指定每次递增的值，默认为1。
+
+🌹`START WITH n`：指定序列的起始值，默认为1。
+
+🌹`MAXVALUE n | NOMAXVALUE`：指定序列的最大值，如果设置为NOMAXVALUE，则没有最大值限制。
+
+🌹`MINVALUE n | NOMINVALUE`：指定序列的最小值，如果设置为NOMINVALUE，则没有最小值限制。
+
+🌹`CYCLE | NOCYCLE`：指示序列是否循环，即当达到最大值或最小值时是否重新开始，默认为NOCYCLE。
+
+🌹`CACHE n | NOCACHE`：指定序列缓存的值的数量，默认为NOCACHE，表示不缓存。
 
 
 
-- 每次调用`NEXTVAL`函数时，序列的值会自动递增，并返回递增后的值
+:fire: 每次调用`NEXTVAL`函数时，序列的值会自动递增，并返回递增后的值
 
 ```sql
 SELECT sequence_name.NEXTVAL FROM DUAL;
@@ -1398,7 +2067,9 @@ SELECT sequence_name.NEXTVAL FROM DUAL;
 
 其中，`sequence_name`是序列的名称。
 
-- `CURRVAL`函数返回的是上一次使用`NEXTVAL`函数获取的值，而不是当前调用`CURRVAL`函数时的值。
+
+
+🧲`CURRVAL`函数返回的是上一次使用`NEXTVAL`函数获取的值，而不是当前调用`CURRVAL`函数时的值。
 
 ```sql
 SELECT sequence_name.CURRVAL FROM DUAL;
@@ -1406,19 +2077,23 @@ SELECT sequence_name.CURRVAL FROM DUAL;
 
 需要注意的是，使用`CURRVAL`函数之前必须先使用`NEXTVAL`函数至少一次，否则会报错。另外，`CURRVAL`函数只能在同一个会话中获取序列的当前值。
 
-# **基于伪列的查询**
+
+
+# 伪列
 
 在 Oracle 的表的使用过程中，实际表中还有一些附加的列，称为伪列。伪列就像表中的列一样，但是在表中并不存储。伪列只能查询，不能进行增删改操作。
 
-接下来学习两个伪列：ROWID 和 ROWNUM。
 
-##  ROWID
 
-表中的每一行在数据文件中都有一个物理地址，ROWID 伪列返回的就是该行的物理地址。使用 ROWID 可以快速的定位表中的某一行。ROWID 值可以唯一的标识表中的一行。由于 ROWID 返回的是该行的物理地址，因此使用 ROWID 可以显示行是如何存储的。
+🛑  **行物理地址**
+
+**ROWID**
+
+表中的每一行在数据文件中都有一个物理地址，**ROWID 伪列返回的就是该行的物理地址。**使用 ROWID 可以快速的定位表中的某一行。ROWID 值可以唯一的标识表中的一行。由于 ROWID 返回的是该行的物理地址，因此使用 ROWID 可以显示行是如何存储的。
 
 ```mysql
 select rowID,t.* from T_AREA t
-* 不可以和 rowID 一块用
+-- '*'不可以和"rowID"一块用
 ```
 
 <img src="Oracle image/18.png" style="zoom:50%;" /> 
@@ -1428,9 +2103,13 @@ select rowID,t.*from T_AREA t
 where ROWID='AAAM1uAAGAAAAD8AAC';
 ```
 
-## **ROWNUM**
 
-在查询的结果集中，ROWNUM 为结果集中每一行标识一个行号，第一行返回 1，第二行返回 2，以此类推。通过 ROWNUM 伪列可以限制查询结果集中返回的行数。
+
+**🛑 行数**
+
+**ROWNUM**
+
+在查询的结果集中，**ROWNUM 为结果集中每一行标识一个行号，第一行返回 1，第二行返回 2，以此类推。**通过 ROWNUM 伪列可以限制查询结果集中返回的行数。
 
 ```mysql
 select rownum,t.* from T_OWNERTYPE t
@@ -1438,7 +2117,11 @@ select rownum,t.* from T_OWNERTYPE t
 
 <img src="Oracle image/19.png" style="zoom:50%;" /> 
 
-#  📒 tust例题
+
+
+
+
+#  📒 天津科技大学选择题
 
 🐔以下关于表空间的描述，正确的是()
 
