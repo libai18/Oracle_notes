@@ -1,5 +1,9 @@
 # Oracle_notes
 
+# first
+
+先下载好后，用typora打开，有目录便于学习。GitHub不支持[toc]	
+
 # Oracle笔记
 
 这个项目是我在学习Oracle数据库时整理的笔记。我希望通过分享这些笔记，能够帮助其他学习Oracle的人们更好地理解和掌握这门技术。
